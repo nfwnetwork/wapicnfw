@@ -1,0 +1,280 @@
+/**
+ * Synnio Calendar Admin Styles
+ */
+
+.synnio-calendar-admin {
+    --synnio-primary: #0F0B45;
+    --synnio-primary-light: #1a1463;
+    --synnio-success: #10B981;
+    --synnio-warning: #F59E0B;
+    --synnio-danger: #EF4444;
+    --synnio-gray-50: #F9FAFB;
+    --synnio-gray-100: #F3F4F6;
+    --synnio-gray-200: #E5E7EB;
+    --synnio-gray-500: #6B7280;
+    --synnio-gray-700: #374151;
+}
+
+.synnio-calendar-admin h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--synnio-primary);
+}
+
+.synnio-calendar-admin h1 .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+/* Info Box */
+.synnio-admin-info-box {
+    background: #fff;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.synnio-admin-info-box h2 {
+    margin-top: 0;
+    color: var(--synnio-primary);
+}
+
+.synnio-admin-info-box h3,
+.synnio-admin-info-box h4 {
+    color: var(--synnio-primary);
+}
+
+.synnio-admin-info-box code {
+    background: var(--synnio-gray-100);
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.synnio-admin-info-box ul {
+    margin-left: 20px;
+}
+
+.synnio-admin-info-box ul li code {
+    padding: 2px 6px;
+}
+
+/* Stats Grid */
+.synnio-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.synnio-stat-card {
+    background: #fff;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.synnio-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--synnio-primary);
+}
+
+.synnio-stat-label {
+    font-size: 13px;
+    color: var(--synnio-gray-500);
+    margin-top: 4px;
+}
+
+/* Status Badges */
+.synnio-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.synnio-status-active {
+    color: var(--synnio-success);
+}
+
+.synnio-status-inactive {
+    color: var(--synnio-gray-500);
+}
+
+.synnio-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.synnio-badge-success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.synnio-badge-warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+/* Customers Table */
+.synnio-customers-table-wrapper {
+    background: #fff;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.synnio-customers-table-wrapper .search-box {
+    margin-bottom: 20px;
+}
+
+/* Settings */
+.synnio-settings-content {
+    background: #fff;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.synnio-api-info {
+    background: var(--synnio-gray-50);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.synnio-api-info table {
+    margin-top: 0;
+}
+
+.synnio-api-info table code {
+    background: var(--synnio-gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Calendar Wrapper */
+.synnio-admin-calendar-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.synnio-admin-stats {
+    background: #fff;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.synnio-admin-stats h3 {
+    margin-top: 0;
+    color: var(--synnio-primary);
+}
+
+/* Navigation Tabs - Eigene Klassen um Plugin-Konflikte zu vermeiden */
+.synnio-admin-tabs {
+    display: flex;
+    border-bottom: 1px solid #c3c4c7;
+    margin: 20px 0 0 0;
+    padding: 0;
+}
+
+.synnio-admin-tab {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    text-decoration: none;
+    color: #50575e;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.synnio-admin-tab:hover {
+    background: #fff;
+    color: var(--synnio-primary);
+}
+
+.synnio-admin-tab.active {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+    color: var(--synnio-primary);
+    font-weight: 600;
+}
+
+/* Legacy support - entfernt */
+
+/* Form Table */
+.synnio-calendar-admin .form-table th {
+    width: 200px;
+    padding: 20px 10px 20px 0;
+}
+
+.synnio-calendar-admin .form-table td {
+    padding: 15px 10px;
+}
+
+.synnio-calendar-admin .form-table select,
+.synnio-calendar-admin .form-table input[type="text"],
+.synnio-calendar-admin .form-table input[type="password"],
+.synnio-calendar-admin .form-table input[type="time"] {
+    padding: 8px 12px;
+    border: 1px solid var(--synnio-gray-200);
+    border-radius: 4px;
+}
+
+.synnio-calendar-admin .form-table input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.synnio-calendar-admin .description {
+    color: var(--synnio-gray-500);
+    font-style: normal;
+}
+
+/* Submit Button */
+.synnio-calendar-admin .submit .button-primary {
+    background: var(--synnio-primary);
+    border-color: var(--synnio-primary);
+    padding: 8px 20px;
+    height: auto;
+}
+
+.synnio-calendar-admin .submit .button-primary:hover {
+    background: var(--synnio-primary-light);
+    border-color: var(--synnio-primary-light);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .synnio-admin-calendar-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .synnio-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .synnio-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

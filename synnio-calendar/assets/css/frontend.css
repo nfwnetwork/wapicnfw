@@ -1,0 +1,1683 @@
+/**
+ * Synnio Calendar Frontend Styles
+ * Version 3.2.0 - Event-Bearbeitung, Farbauswahl und Kalender-Erstellung
+ * WICHTIG: Alle Styles mit maximaler Spezifitaet fuer Elementor-Kompatibilitaet
+ */
+
+/* ===== RESET UND ISOLATION ===== */
+#synnio-calendar-wrapper,
+#synnio-calendar-wrapper *,
+#synnio-calendar-wrapper *::before,
+#synnio-calendar-wrapper *::after {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#synnio-calendar-wrapper {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: #374151 !important;
+    background: #F9FAFB !important;
+}
+
+/* ===== HAUPT-APP CONTAINER ===== */
+#synnio-calendar-wrapper .synnio-calendar-app {
+    display: flex !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #F9FAFB !important;
+}
+
+/* ===== WEISSE SCHRIFT AUF DUNKLEM HINTERGRUND ===== */
+#synnio-calendar-wrapper .synnio-btn-new-event,
+#synnio-calendar-wrapper .synnio-btn-new-event *,
+#synnio-calendar-wrapper .synnio-btn-primary,
+#synnio-calendar-wrapper .synnio-btn-primary *,
+#synnio-calendar-wrapper .synnio-btn-success,
+#synnio-calendar-wrapper .synnio-btn-success *,
+#synnio-calendar-wrapper .synnio-btn-danger,
+#synnio-calendar-wrapper .synnio-btn-danger *,
+#synnio-calendar-wrapper .synnio-mini-cal-day.today,
+#synnio-calendar-wrapper .synnio-mini-cal-day.selected,
+#synnio-calendar-wrapper .synnio-api-info,
+#synnio-calendar-wrapper .synnio-api-info *,
+#synnio-calendar-wrapper .synnio-logo-icon,
+#synnio-calendar-wrapper .synnio-logo-icon *,
+#synnio-calendar-wrapper .synnio-day-chip.selected,
+#synnio-calendar-wrapper .synnio-time-chip.selected,
+#synnio-calendar-wrapper .synnio-event,
+#synnio-calendar-wrapper .synnio-event *,
+#synnio-calendar-wrapper .synnio-week-header-cell.today .synnio-day-number,
+#synnio-calendar-wrapper .synnio-integration-outlook,
+#synnio-calendar-wrapper .synnio-integration-outlook * {
+    color: #FFFFFF !important;
+}
+
+/* ===== DUNKLE SCHRIFT AUF HELLEM HINTERGRUND ===== */
+#synnio-calendar-wrapper .synnio-mini-cal-title,
+#synnio-calendar-wrapper .synnio-logo span,
+#synnio-calendar-wrapper .synnio-current-date,
+#synnio-calendar-wrapper .synnio-right-panel-title,
+#synnio-calendar-wrapper .synnio-stat-value,
+#synnio-calendar-wrapper .synnio-logo {
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-section-title {
+    color: #9CA3AF !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-name,
+#synnio-calendar-wrapper .synnio-form-label,
+#synnio-calendar-wrapper .synnio-upcoming-event-title,
+#synnio-calendar-wrapper .synnio-integration-name,
+#synnio-calendar-wrapper .synnio-day-number,
+#synnio-calendar-wrapper .synnio-form-checkbox span {
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-stat-label,
+#synnio-calendar-wrapper .synnio-upcoming-event-time,
+#synnio-calendar-wrapper .synnio-integration-status,
+#synnio-calendar-wrapper .synnio-time-slot-label,
+#synnio-calendar-wrapper .synnio-day-name,
+#synnio-calendar-wrapper .synnio-tab,
+#synnio-calendar-wrapper .synnio-mini-cal-day-name {
+    color: #6B7280 !important;
+}
+
+#synnio-calendar-wrapper .synnio-sidebar-footer-btn,
+#synnio-calendar-wrapper .synnio-view-btn,
+#synnio-calendar-wrapper .synnio-btn-secondary {
+    color: #4B5563 !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab.active,
+#synnio-calendar-wrapper .synnio-view-btn.active {
+    color: #0F0B45 !important;
+}
+
+/* ===== SIDEBAR ===== */
+#synnio-calendar-wrapper .synnio-sidebar {
+    width: 280px !important;
+    background: #FFFFFF !important;
+    border-right: 1px solid #E5E7EB !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+    height: auto !important;
+    z-index: auto !important;
+}
+
+#synnio-calendar-wrapper .synnio-sidebar-header {
+    padding: 20px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+}
+
+#synnio-calendar-wrapper .synnio-logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background: #0F0B45 !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-new-event {
+    width: 100% !important;
+    margin-top: 16px !important;
+    padding: 12px 20px !important;
+    background: #0F0B45 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-new-event:hover {
+    background: #1a1463 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ===== MINI CALENDAR ===== */
+#synnio-calendar-wrapper .synnio-mini-calendar {
+    padding: 20px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 16px !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-title {
+    font-weight: 600 !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-nav {
+    display: flex !important;
+    gap: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-nav button {
+    width: 28px !important;
+    height: 28px !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    color: #6B7280 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-nav button:hover {
+    background: #F3F4F6 !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 2px !important;
+    text-align: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day-name {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    padding: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day {
+    font-size: 12px !important;
+    padding: 6px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day:hover {
+    background: #F3F4F6 !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day.other-month {
+    color: #D1D5DB !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day.today {
+    background: #0F0B45 !important;
+    font-weight: 600 !important;
+}
+
+#synnio-calendar-wrapper .synnio-mini-cal-day.selected {
+    background: #2d2587 !important;
+}
+
+/* ===== CALENDAR TYPES ===== */
+#synnio-calendar-wrapper .synnio-calendar-types {
+    padding: 20px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+#synnio-calendar-wrapper .synnio-section-title {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    margin-bottom: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-item:hover {
+    background: #F3F4F6 !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-item input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-color {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 3px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-name {
+    flex: 1 !important;
+    font-size: 14px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-count {
+    font-size: 12px !important;
+    color: #9CA3AF !important;
+    background: #F3F4F6 !important;
+    padding: 2px 8px !important;
+    border-radius: 10px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-edit-btn {
+    opacity: 0 !important;
+    background: none !important;
+    border: none !important;
+    color: #9CA3AF !important;
+    cursor: pointer !important;
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+    transition: opacity 0.15s, color 0.15s, background 0.15s !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-item:hover .synnio-calendar-edit-btn {
+    opacity: 1 !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-edit-btn:hover {
+    color: #374151 !important;
+    background: #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-type-item .synnio-calendar-type-name,
+#synnio-calendar-wrapper .synnio-calendar-type-item .synnio-calendar-color {
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-credential-row {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-credential-row .synnio-form-input {
+    flex: 1 !important;
+    background: #F3F4F6 !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 13px !important;
+}
+
+#synnio-calendar-wrapper .synnio-copy-btn {
+    flex-shrink: 0 !important;
+    padding: 8px 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-add-calendar-btn,
+#synnio-calendar-wrapper .synnio-add-item-btn {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    margin-top: 12px !important;
+    background: transparent !important;
+    border: 1px dashed #D1D5DB !important;
+    border-radius: 8px !important;
+    color: #6B7280 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s !important;
+}
+
+#synnio-calendar-wrapper .synnio-add-calendar-btn:hover,
+#synnio-calendar-wrapper .synnio-add-item-btn:hover {
+    background: #F9FAFB !important;
+    border-color: #9CA3AF !important;
+    color: #374151 !important;
+}
+
+/* ===== SIDEBAR FOOTER ===== */
+#synnio-calendar-wrapper .synnio-sidebar-footer {
+    padding: 16px 20px !important;
+    border-top: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-sidebar-footer-btn {
+    width: 100% !important;
+    padding: 10px !important;
+    background: transparent !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-sidebar-footer-btn:last-child {
+    margin-bottom: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-sidebar-footer-btn:hover {
+    background: #F9FAFB !important;
+    border-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+/* ===== MAIN CONTENT ===== */
+#synnio-calendar-wrapper .synnio-main-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* ===== HEADER ===== */
+#synnio-calendar-wrapper .synnio-main-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 24px !important;
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-today {
+    padding: 8px 16px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #374151 !important;
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-today:hover {
+    background: #F9FAFB !important;
+    border-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-nav-arrows {
+    display: flex !important;
+    gap: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-nav-arrows button {
+    width: 36px !important;
+    height: 36px !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    color: #4B5563 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-nav-arrows button:hover {
+    background: #F9FAFB !important;
+    border-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-current-date {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+}
+
+#synnio-calendar-wrapper .synnio-header-center {
+    display: flex !important;
+    gap: 4px !important;
+    background: #F3F4F6 !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-view-btn {
+    padding: 8px 16px !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-view-btn.active {
+    background: #FFFFFF !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+
+#synnio-calendar-wrapper .synnio-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-search-box {
+    position: relative !important;
+}
+
+#synnio-calendar-wrapper .synnio-search-box input {
+    width: 220px !important;
+    padding: 8px 12px 8px 36px !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    background: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-search-box input:focus {
+    outline: none !important;
+    border-color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-search-box i {
+    position: absolute !important;
+    left: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #9CA3AF !important;
+}
+
+#synnio-calendar-wrapper .synnio-icon-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    color: #4B5563 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+}
+
+#synnio-calendar-wrapper .synnio-icon-btn:hover {
+    background: #F9FAFB !important;
+    border-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-icon-btn .synnio-badge {
+    position: absolute !important;
+    top: -4px !important;
+    right: -4px !important;
+    width: 18px !important;
+    height: 18px !important;
+    background: #EF4444 !important;
+    color: #FFFFFF !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* ===== CALENDAR GRID ===== */
+#synnio-calendar-wrapper .synnio-calendar-container {
+    flex: 1 !important;
+    overflow: auto !important;
+    padding: 24px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-view {
+    height: 100% !important;
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    overflow: hidden !important;
+}
+
+/* ===== WEEK VIEW ===== */
+#synnio-calendar-wrapper .synnio-week-view {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+#synnio-calendar-wrapper .synnio-week-header {
+    display: grid !important;
+    grid-template-columns: 60px repeat(7, 1fr) !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    background: #F9FAFB !important;
+}
+
+#synnio-calendar-wrapper .synnio-week-header-cell {
+    padding: 16px 8px !important;
+    text-align: center !important;
+    border-left: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-week-header-cell:first-child {
+    border-left: none !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-name {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-number {
+    font-size: 24px !important;
+    font-weight: 600 !important;
+}
+
+#synnio-calendar-wrapper .synnio-week-header-cell.today .synnio-day-number {
+    width: 40px !important;
+    height: 40px !important;
+    background: #0F0B45 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: -4px auto !important;
+}
+
+#synnio-calendar-wrapper .synnio-week-body {
+    flex: 1 !important;
+    display: grid !important;
+    grid-template-columns: 60px repeat(7, 1fr) !important;
+    overflow-y: auto !important;
+    padding-top: 8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-column {
+    border-right: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-slot-label {
+    height: 60px !important;
+    padding: 0 8px !important;
+    font-size: 11px !important;
+    text-align: right !important;
+    position: relative !important;
+    top: -8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-column {
+    border-left: 1px solid #E5E7EB !important;
+    position: relative !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-column:first-of-type {
+    border-left: none !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-slot {
+    height: 60px !important;
+    border-bottom: 1px solid #F3F4F6 !important;
+    position: relative !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-slot:hover {
+    background: #F9FAFB !important;
+    cursor: pointer !important;
+}
+
+/* ===== EVENTS ===== */
+#synnio-calendar-wrapper .synnio-event {
+    position: absolute !important;
+    left: 4px;
+    right: 4px;
+    padding: 6px 8px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
+    box-sizing: border-box !important;
+    /* left/right ohne !important damit inline-styles fuer parallele Anordnung greifen */
+}
+
+#synnio-calendar-wrapper .synnio-event:hover {
+    transform: scale(1.02) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+    z-index: 10 !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-title {
+    font-weight: 600 !important;
+    margin-bottom: 2px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-time {
+    font-size: 11px !important;
+    opacity: 0.9 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-sales {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-meeting {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-consultation {
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%) !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-private {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-blocked {
+    background: #E5E7EB !important;
+    color: #4B5563 !important;
+    border: 1px dashed #D1D5DB !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-available {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%) !important;
+    border: 2px solid #059669 !important;
+}
+
+/* ===== CURRENT TIME LINE ===== */
+#synnio-calendar-wrapper .synnio-current-time-line {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: #EF4444 !important;
+    z-index: 5 !important;
+}
+
+#synnio-calendar-wrapper .synnio-current-time-line::before {
+    content: '' !important;
+    position: absolute !important;
+    left: -5px !important;
+    top: -4px !important;
+    width: 10px !important;
+    height: 10px !important;
+    background: #EF4444 !important;
+    border-radius: 50% !important;
+}
+
+/* ===== RIGHT PANEL ===== */
+#synnio-calendar-wrapper .synnio-right-panel {
+    width: 320px !important;
+    background: #FFFFFF !important;
+    border-left: 1px solid #E5E7EB !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-right-panel-header {
+    padding: 20px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-right-panel-title {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+#synnio-calendar-wrapper .synnio-right-panel-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+}
+
+/* ===== STATS ===== */
+#synnio-calendar-wrapper .synnio-stats-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    margin-top: 20px !important;
+}
+
+#synnio-calendar-wrapper .synnio-stat-card {
+    background: #F9FAFB !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    text-align: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-stat-value {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+}
+
+#synnio-calendar-wrapper .synnio-stat-label {
+    font-size: 12px !important;
+    margin-top: 4px !important;
+}
+
+/* ===== API INFO ===== */
+#synnio-calendar-wrapper .synnio-api-info {
+    background: #0F0B45 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-top: 20px !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-info-title {
+    font-weight: 600 !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-endpoint {
+    background: rgba(255, 255, 255, 0.1) !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    font-family: monospace !important;
+    font-size: 13px !important;
+    margin-bottom: 12px !important;
+    word-break: break-all !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-example {
+    font-size: 12px !important;
+    opacity: 0.8 !important;
+}
+
+/* =================================================================
+   MODALS - KRITISCH: Hoechste Spezifitaet und z-index
+   ================================================================= */
+
+/* Modal Overlay */
+#synnioEventModal,
+#synnioBatchModal,
+#synnioSettingsModal,
+#synnioEditCalendarModal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+
+/* Modal aktiv */
+#synnioEventModal.active,
+#synnioBatchModal.active,
+#synnioSettingsModal.active,
+#synnioEditCalendarModal.active {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Modal Container */
+#synnioEventModal > .synnio-modal,
+#synnioBatchModal > .synnio-modal,
+#synnioSettingsModal > .synnio-modal,
+#synnioEditCalendarModal > .synnio-modal {
+    background: #FFFFFF !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    width: 90% !important;
+    max-width: 560px !important;
+    max-height: 90vh !important;
+    overflow: hidden !important;
+    transform: scale(0.95) translateY(20px) !important;
+    transition: transform 0.2s ease !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    z-index: 1000000 !important;
+}
+
+#synnioEventModal.active > .synnio-modal,
+#synnioBatchModal.active > .synnio-modal,
+#synnioSettingsModal.active > .synnio-modal,
+#synnioEditCalendarModal.active > .synnio-modal {
+    transform: scale(1) translateY(0) !important;
+}
+
+/* Groesseres Modal */
+#synnioBatchModal > .synnio-modal,
+#synnioSettingsModal > .synnio-modal {
+    max-width: 720px !important;
+}
+
+/* Edit Calendar Modal - kompakter und modern */
+#synnioEditCalendarModal > .synnio-modal {
+    max-width: 460px !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-header {
+    background: #0F0B45 !important;
+    border-bottom: none !important;
+    padding: 20px 28px !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-title {
+    color: #FFFFFF !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-close {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-close:hover {
+    color: #FFFFFF !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-body {
+    padding: 28px 28px 20px !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-footer {
+    padding: 16px 28px !important;
+    border-radius: 0 0 16px 16px !important;
+}
+
+#synnioEditCalendarModal .synnio-form-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+#synnioEditCalendarModal .synnio-color-options {
+    gap: 10px !important;
+    padding: 4px 0 !important;
+}
+
+#synnioEditCalendarModal .synnio-color-option {
+    width: 36px !important;
+    height: 36px !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+
+/* Modal Header */
+#synnioEventModal .synnio-modal-header,
+#synnioBatchModal .synnio-modal-header,
+#synnioSettingsModal .synnio-modal-header,
+#synnioEditCalendarModal .synnio-modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 20px 24px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    flex-shrink: 0 !important;
+}
+
+/* Modal Title */
+#synnioEventModal .synnio-modal-title,
+#synnioBatchModal .synnio-modal-title,
+#synnioSettingsModal .synnio-modal-title,
+#synnioEditCalendarModal .synnio-modal-title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #0F0B45 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+}
+
+/* Modal Close Button */
+#synnioEventModal .synnio-modal-close,
+#synnioBatchModal .synnio-modal-close,
+#synnioSettingsModal .synnio-modal-close,
+#synnioEditCalendarModal .synnio-modal-close {
+    width: 32px !important;
+    height: 32px !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    color: #9CA3AF !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#synnioEventModal .synnio-modal-close:hover,
+#synnioBatchModal .synnio-modal-close:hover,
+#synnioSettingsModal .synnio-modal-close:hover,
+#synnioEditCalendarModal .synnio-modal-close:hover {
+    background: #F3F4F6 !important;
+    color: #374151 !important;
+}
+
+/* Modal Body */
+#synnioEventModal .synnio-modal-body,
+#synnioBatchModal .synnio-modal-body,
+#synnioSettingsModal .synnio-modal-body,
+#synnioEditCalendarModal .synnio-modal-body {
+    padding: 28px 32px !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
+    background: #FFFFFF !important;
+}
+
+/* Modal Footer */
+#synnioEventModal .synnio-modal-footer,
+#synnioBatchModal .synnio-modal-footer,
+#synnioSettingsModal .synnio-modal-footer,
+#synnioEditCalendarModal .synnio-modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    padding: 16px 24px !important;
+    border-top: 1px solid #E5E7EB !important;
+    background: #F9FAFB !important;
+    flex-shrink: 0 !important;
+}
+
+/* ===== FORM ELEMENTS ===== */
+#synnio-calendar-wrapper .synnio-form-group {
+    margin-bottom: 20px !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-label {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    margin-bottom: 6px !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-input,
+#synnio-calendar-wrapper input[type="text"],
+#synnio-calendar-wrapper input[type="date"],
+#synnio-calendar-wrapper input[type="time"] {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    background: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-input:focus,
+#synnio-calendar-wrapper input:focus {
+    outline: none !important;
+    border-color: #0F0B45 !important;
+    box-shadow: 0 0 0 3px rgba(15, 11, 69, 0.1) !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-select,
+#synnio-calendar-wrapper select {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    background: #FFFFFF !important;
+    cursor: pointer !important;
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-textarea,
+#synnio-calendar-wrapper textarea {
+    width: 100% !important;
+    padding: 10px 12px !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    resize: vertical !important;
+    min-height: 80px !important;
+    color: #374151 !important;
+    background: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-checkbox {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-form-checkbox input {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: #0F0B45 !important;
+}
+
+/* ===== COLOR PICKER ===== */
+#synnio-calendar-wrapper .synnio-color-options {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+#synnio-calendar-wrapper .synnio-color-option {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    border: 2px solid transparent !important;
+}
+
+#synnio-calendar-wrapper .synnio-color-option:hover {
+    transform: scale(1.1) !important;
+}
+
+#synnio-calendar-wrapper .synnio-color-option.selected {
+    border-color: #0F0B45 !important;
+    box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F0B45 !important;
+}
+
+/* ===== BUTTONS ===== */
+#synnio-calendar-wrapper .synnio-btn {
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border: none !important;
+    transition: all 0.15s !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-primary {
+    background: #0F0B45 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-primary:hover {
+    background: #1a1463 !important;
+    transform: translateY(-1px) !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-secondary {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    color: #4B5563 !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-secondary:hover {
+    background: #F9FAFB !important;
+    border-color: #D1D5DB !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-success {
+    background: #10B981 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-success:hover {
+    background: #059669 !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-danger {
+    background: #EF4444 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn-danger:hover {
+    background: #DC2626 !important;
+}
+
+/* ===== BATCH PROCESSING ===== */
+#synnio-calendar-wrapper .synnio-batch-section {
+    background: #F9FAFB !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+#synnio-calendar-wrapper .synnio-batch-title {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-selector {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 16px !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-chip {
+    padding: 8px 14px !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    border-radius: 20px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-chip:hover {
+    border-color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-day-chip.selected {
+    background: #0F0B45 !important;
+    border-color: #0F0B45 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-chip {
+    padding: 6px 12px !important;
+    border: 1px solid #E5E7EB !important;
+    background: #FFFFFF !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-chip:hover {
+    border-color: #10B981 !important;
+    background: #ECFDF5 !important;
+}
+
+#synnio-calendar-wrapper .synnio-time-chip.selected {
+    background: #10B981 !important;
+    border-color: #10B981 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-add-time-btn {
+    padding: 6px 12px !important;
+    border: 1px dashed #D1D5DB !important;
+    background: transparent !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    color: #6B7280 !important;
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-add-time-btn:hover {
+    border-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+/* ===== TABS ===== */
+#synnio-calendar-wrapper .synnio-tabs {
+    display: flex !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    margin-bottom: 20px !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab {
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-bottom: 2px solid transparent !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    color: #6B7280 !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab:hover {
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab.active {
+    border-bottom-color: #0F0B45 !important;
+    color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab-content {
+    display: none !important;
+}
+
+#synnio-calendar-wrapper .synnio-tab-content.active {
+    display: block !important;
+}
+
+/* ===== SETTINGS ===== */
+#synnio-calendar-wrapper .synnio-settings-section {
+    margin-bottom: 24px !important;
+}
+
+#synnio-calendar-wrapper .synnio-settings-title {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    color: #0F0B45 !important;
+}
+
+/* ===== INTEGRATION CARDS ===== */
+#synnio-calendar-wrapper .synnio-integration-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 16px !important;
+    background: #F9FAFB !important;
+    border-radius: 8px !important;
+    margin-bottom: 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-icon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 24px !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-outlook {
+    background: #0078D4 !important;
+    color: #FFFFFF !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-google {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    color: #4285F4 !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-info {
+    flex: 1 !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-name {
+    font-weight: 600 !important;
+    margin-bottom: 2px !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-status {
+    font-size: 13px !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-status.connected {
+    color: #10B981 !important;
+}
+
+#synnio-calendar-wrapper .synnio-integration-actions {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+#synnio-calendar-wrapper .synnio-sync-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn.connected {
+    background: #FEF2F2 !important;
+    color: #DC2626 !important;
+    border: 1px solid #FECACA !important;
+}
+
+#synnio-calendar-wrapper .synnio-btn.connected:hover {
+    background: #FEE2E2 !important;
+}
+
+/* ===== MESSAGES ===== */
+#synnio-calendar-wrapper .synnio-calendar-message {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 60px 40px !important;
+    text-align: center !important;
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    margin: 40px auto !important;
+    max-width: 500px !important;
+}
+
+#synnio-calendar-wrapper .synnio-message-icon {
+    width: 80px !important;
+    height: 80px !important;
+    background: #F3F4F6 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 32px !important;
+    color: #9CA3AF !important;
+    margin-bottom: 24px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-message h3 {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: #0F0B45 !important;
+    margin-bottom: 12px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-message p {
+    color: #6B7280 !important;
+    margin-bottom: 24px !important;
+}
+
+#synnio-calendar-wrapper .synnio-calendar-not-activated .synnio-message-icon {
+    background: #FEF3C7 !important;
+    color: #F59E0B !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    #synnio-calendar-wrapper .synnio-right-panel {
+        display: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    #synnio-calendar-wrapper .synnio-sidebar {
+        width: 240px !important;
+    }
+    #synnio-calendar-wrapper .synnio-header-center {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #synnio-calendar-wrapper .synnio-calendar-app {
+        flex-direction: column !important;
+    }
+    #synnio-calendar-wrapper .synnio-sidebar {
+        width: 100% !important;
+        max-height: 200px !important;
+    }
+    #synnio-calendar-wrapper .synnio-mini-calendar,
+    #synnio-calendar-wrapper .synnio-calendar-types {
+        display: none !important;
+    }
+    #synnio-calendar-wrapper .synnio-main-header {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+    #synnio-calendar-wrapper .synnio-search-box {
+        display: none !important;
+    }
+    #synnio-calendar-wrapper .synnio-form-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ===== HUB INTEGRATION ===== */
+/* Wenn Kalender innerhalb des Communications Hub eingebettet ist */
+.synnio-hub-container #synnio-calendar-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.synnio-hub-container #synnio-calendar-wrapper .synnio-calendar-app {
+    height: 100% !important;
+}
+
+/* Im Hub-Kontext: Rechtes Panel ausblenden - Platz fuer Hub-Sidebar + Kalender-Sidebar + Inhalt */
+.synnio-hub-container #synnio-calendar-wrapper .synnio-right-panel {
+    display: none !important;
+}
+
+/* Kalender-Sidebar im Hub etwas schmaler */
+.synnio-hub-container #synnio-calendar-wrapper .synnio-sidebar {
+    width: 260px !important;
+    border-right: 1px solid #E5E7EB !important;
+}
+
+/* Logo im Kalender-Sidebar ausblenden wenn im Hub (Hub hat eigenes Logo) */
+.synnio-hub-container #synnio-calendar-wrapper .synnio-sidebar-header .synnio-logo {
+    display: none !important;
+}
+
+.synnio-hub-container #synnio-calendar-wrapper .synnio-sidebar-header {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+/* ===== OEFFNUNGSZEITEN & PAUSEN OVERLAYS ===== */
+#synnio-calendar-wrapper .synnio-closed-overlay {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0.03) 10px,
+        rgba(0, 0, 0, 0.06) 10px,
+        rgba(0, 0, 0, 0.06) 20px
+    ) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+#synnio-calendar-wrapper .synnio-break-overlay {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: rgba(249, 115, 22, 0.08) !important;
+    border-top: 1px dashed rgba(249, 115, 22, 0.3) !important;
+    border-bottom: 1px dashed rgba(249, 115, 22, 0.3) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+/* ===== OEFFNUNGSZEITEN SETTINGS ===== */
+#synnio-calendar-wrapper .synnio-business-hours-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid #F3F4F6 !important;
+}
+
+#synnio-calendar-wrapper .synnio-business-hours-row:last-child {
+    border-bottom: none !important;
+}
+
+#synnio-calendar-wrapper .synnio-bh-day-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 140px !important;
+    flex-shrink: 0 !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-bh-day-label input[type="checkbox"] {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: #0F0B45 !important;
+}
+
+#synnio-calendar-wrapper .synnio-bh-separator {
+    color: #6B7280 !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-business-hours-row .synnio-form-input {
+    width: 120px !important;
+    flex-shrink: 0 !important;
+}
+
+/* ===== PAUSEN SETTINGS ===== */
+#synnio-calendar-wrapper .synnio-break-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+    margin-bottom: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-break-row .synnio-break-label {
+    width: 160px !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-break-row .synnio-break-start,
+#synnio-calendar-wrapper .synnio-break-row .synnio-break-end {
+    width: 120px !important;
+    flex-shrink: 0 !important;
+}
+
+/* ===== EIGENE TERMINTYPEN ===== */
+#synnio-calendar-wrapper .synnio-event-type-display-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid #F3F4F6 !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-type-display-row:last-child {
+    border-bottom: none !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-type-color {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 4px !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-type-label {
+    flex: 1 !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+}
+
+#synnio-calendar-wrapper .synnio-event-type-key {
+    font-size: 12px !important;
+    color: #9CA3AF !important;
+    font-family: monospace !important;
+    background: #F3F4F6 !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-custom-event-type-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+    margin-bottom: 4px !important;
+}
+
+#synnio-calendar-wrapper .synnio-custom-event-type-row .synnio-cet-key {
+    width: 140px !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-custom-event-type-row .synnio-cet-label {
+    width: 180px !important;
+    flex-shrink: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-custom-event-type-row .synnio-cet-color {
+    width: 40px !important;
+    height: 36px !important;
+    border: 1px solid #D1D5DB !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    padding: 2px !important;
+    flex-shrink: 0 !important;
+}
+
+/* ===== SETTINGS SECTIONS ===== */
+#synnio-calendar-wrapper .synnio-settings-section {
+    margin-bottom: 28px !important;
+    padding-bottom: 20px !important;
+    border-bottom: 1px solid #E5E7EB !important;
+}
+
+#synnio-calendar-wrapper .synnio-settings-section:last-child {
+    border-bottom: none !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#synnio-calendar-wrapper .synnio-settings-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #0F0B45 !important;
+    margin-bottom: 12px !important;
+}
