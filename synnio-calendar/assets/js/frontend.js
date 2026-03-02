@@ -1460,12 +1460,18 @@
 
             html += '</div>';
 
+            // Anzeigebereich berechnen
+            var dispRange = self.getDisplayRange();
+            var dispStartHour = dispRange.startHour;
+            var dispEndHour = dispRange.endHour;
+            var dispStartMin = dispRange.startMin;
+
             // Body
             html += '<div class="synnio-week-body" id="synnioWeekBody">';
 
             // Zeit-Spalte
             html += '<div class="synnio-time-column">';
-            for (var h = 0; h < 24; h++) {
+            for (var h = dispStartHour; h < dispEndHour; h++) {
                 html += '<div class="synnio-time-slot-label">' + h.toString().padStart(2, '0') + ':00</div>';
             }
             html += '</div>';
@@ -1478,7 +1484,7 @@
 
                 html += '<div class="synnio-day-column" data-date="' + self.formatDate(dayDate) + '">';
 
-                for (var hour = 0; hour < 24; hour++) {
+                for (var hour = dispStartHour; hour < dispEndHour; hour++) {
                     html += '<div class="synnio-time-slot" data-hour="' + hour + '"></div>';
                 }
 
@@ -1486,8 +1492,10 @@
                 if (isDayToday) {
                     var now = new Date();
                     var minutes = now.getHours() * 60 + now.getMinutes();
-                    var top = (minutes / 60) * 60;
-                    html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
+                    if (minutes >= dispStartMin && minutes < dispEndHour * 60) {
+                        var top = minutes - dispStartMin;
+                        html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
+                    }
                 }
 
                 // Oeffnungszeiten- und Pausen-Overlays
@@ -1524,24 +1532,32 @@
             html += '</div>';
             html += '</div>';
 
+            // Anzeigebereich berechnen
+            var dispRange = self.getDisplayRange();
+            var dispStartHour = dispRange.startHour;
+            var dispEndHour = dispRange.endHour;
+            var dispStartMin = dispRange.startMin;
+
             html += '<div class="synnio-week-body" style="grid-template-columns: 60px 1fr;">';
 
             html += '<div class="synnio-time-column">';
-            for (var h = 0; h < 24; h++) {
+            for (var h = dispStartHour; h < dispEndHour; h++) {
                 html += '<div class="synnio-time-slot-label">' + h.toString().padStart(2, '0') + ':00</div>';
             }
             html += '</div>';
 
             html += '<div class="synnio-day-column" data-date="' + self.formatDate(this.currentDate) + '">';
-            for (var hour = 0; hour < 24; hour++) {
+            for (var hour = dispStartHour; hour < dispEndHour; hour++) {
                 html += '<div class="synnio-time-slot" data-hour="' + hour + '"></div>';
             }
 
             if (isToday) {
                 var now = new Date();
                 var minutes = now.getHours() * 60 + now.getMinutes();
-                var top = (minutes / 60) * 60;
-                html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
+                if (minutes >= dispStartMin && minutes < dispEndHour * 60) {
+                    var top = minutes - dispStartMin;
+                    html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
+                }
             }
 
             // Oeffnungszeiten- und Pausen-Overlays
@@ -1815,8 +1831,15 @@
             var endHour = endDate.getHours();
             var endMinutes = endDate.getMinutes();
 
-            var top = (startHour * 60 + startMinutes);
+            // Offset fuer konfigurierbaren Anzeigebereich
+            var dispRange = this.getDisplayRange();
+            var top = (startHour * 60 + startMinutes) - dispRange.startMin;
             var height = ((endHour - startHour) * 60 + (endMinutes - startMinutes));
+
+            // Event ausserhalb des Anzeigebereichs nicht rendern
+            if (top + height <= 0 || top >= (dispRange.endHour - dispRange.startHour) * 60) return;
+            // Event das ueber den Rand hinausgeht beschneiden
+            if (top < 0) { height += top; top = 0; }
 
             // Parallele Breite und Position berechnen
             var padding = 2; // px Abstand zwischen parallelen Events
@@ -2147,6 +2170,12 @@
             if (weekStarts) formData.append('week_starts', weekStarts.value);
             if (syncDirection) formData.append('sync_direction', syncDirection.value);
 
+            // Kalender-Anzeigebereich
+            var displayStart = document.getElementById('synnioSettingsDisplayStart');
+            var displayEnd = document.getElementById('synnioSettingsDisplayEnd');
+            if (displayStart) formData.append('display_start', displayStart.value);
+            if (displayEnd) formData.append('display_end', displayEnd.value);
+
             // Oeffnungszeiten sammeln
             var businessHours = {};
             for (var d = 0; d < 7; d++) {
@@ -2204,6 +2233,8 @@
                             // Lokale Daten aktualisieren
                             synnioCalendar.businessHours = businessHours;
                             synnioCalendar.breaks = breaks;
+                            if (displayStart) synnioCalendar.displayStart = displayStart.value;
+                            if (displayEnd) synnioCalendar.displayEnd = displayEnd.value;
                             alert(response.data.message || 'Einstellungen gespeichert');
                             self.closeAllModals();
                             self.renderCalendar();
@@ -2319,25 +2350,44 @@
             return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
         },
 
+        // Anzeigebereich des Kalenders ermitteln
+        getDisplayRange: function() {
+            var startTime = (typeof synnioCalendar !== 'undefined' && synnioCalendar.displayStart) ? synnioCalendar.displayStart : '07:00';
+            var endTime = (typeof synnioCalendar !== 'undefined' && synnioCalendar.displayEnd) ? synnioCalendar.displayEnd : '20:00';
+            var startHour = parseInt(startTime.split(':')[0], 10) || 0;
+            var endHour = parseInt(endTime.split(':')[0], 10) || 24;
+            if (endHour <= startHour) endHour = startHour + 1;
+            return {
+                startHour: startHour,
+                endHour: endHour,
+                startMin: startHour * 60
+            };
+        },
+
         // Oeffnungszeiten- und Pausen-Overlays fuer einen Wochentag generieren
         renderTimeOverlays: function(dayOfWeek) {
             var html = '';
+            var dispRange = this.getDisplayRange();
+            var dispStartMin = dispRange.startMin;
+            var dispTotalMin = (dispRange.endHour - dispRange.startHour) * 60;
             var bh = (typeof synnioCalendar !== 'undefined' && synnioCalendar.businessHours) ? synnioCalendar.businessHours[dayOfWeek] : null;
 
             if (bh) {
                 if (!bh.enabled) {
                     // Ganzer Tag geschlossen
-                    html += '<div class="synnio-closed-overlay" style="top: 0; height: 1440px;" title="Geschlossen"></div>';
+                    html += '<div class="synnio-closed-overlay" style="top: 0; height: ' + dispTotalMin + 'px;" title="Geschlossen"></div>';
                 } else {
                     var startMin = this.timeToMinutes(bh.start);
                     var endMin = this.timeToMinutes(bh.end);
-                    // Vor Oeffnung
-                    if (startMin > 0) {
-                        html += '<div class="synnio-closed-overlay" style="top: 0; height: ' + startMin + 'px;"></div>';
+                    // Vor Oeffnung (nur wenn innerhalb des Anzeigebereichs)
+                    var overlayTop = Math.max(0, startMin - dispStartMin);
+                    if (startMin > dispStartMin) {
+                        html += '<div class="synnio-closed-overlay" style="top: 0; height: ' + overlayTop + 'px;"></div>';
                     }
-                    // Nach Schluss
-                    if (endMin < 1440) {
-                        html += '<div class="synnio-closed-overlay" style="top: ' + endMin + 'px; height: ' + (1440 - endMin) + 'px;"></div>';
+                    // Nach Schluss (nur wenn innerhalb des Anzeigebereichs)
+                    var overlayBottom = endMin - dispStartMin;
+                    if (overlayBottom < dispTotalMin) {
+                        html += '<div class="synnio-closed-overlay" style="top: ' + Math.max(0, overlayBottom) + 'px; height: ' + (dispTotalMin - Math.max(0, overlayBottom)) + 'px;"></div>';
                     }
                 }
             }
@@ -2347,10 +2397,15 @@
                 var breaks = (typeof synnioCalendar !== 'undefined' && synnioCalendar.breaks) ? synnioCalendar.breaks : [];
                 var self = this;
                 breaks.forEach(function(brk) {
-                    var brkStartMin = self.timeToMinutes(brk.start);
-                    var brkEndMin = self.timeToMinutes(brk.end);
-                    if (brkEndMin > brkStartMin) {
-                        html += '<div class="synnio-break-overlay" style="top: ' + brkStartMin + 'px; height: ' + (brkEndMin - brkStartMin) + 'px;" title="' + self.escapeHtml(brk.label || 'Pause') + '"></div>';
+                    var brkStartMin = self.timeToMinutes(brk.start) - dispStartMin;
+                    var brkEndMin = self.timeToMinutes(brk.end) - dispStartMin;
+                    // Nur rendern wenn im sichtbaren Bereich
+                    if (brkEndMin > 0 && brkStartMin < dispTotalMin) {
+                        var brkTop = Math.max(0, brkStartMin);
+                        var brkHeight = Math.min(brkEndMin, dispTotalMin) - brkTop;
+                        if (brkHeight > 0) {
+                            html += '<div class="synnio-break-overlay" style="top: ' + brkTop + 'px; height: ' + brkHeight + 'px;" title="' + self.escapeHtml(brk.label || 'Pause') + '"></div>';
+                        }
                     }
                 });
             }

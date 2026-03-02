@@ -605,6 +605,14 @@ class Synnio_Calendar_Ajax {
             update_user_meta($user_id, 'synnio_calendar_sync_direction', sanitize_text_field($_POST['sync_direction']));
         }
 
+        // Kalender-Anzeigebereich speichern
+        if (isset($_POST['display_start'])) {
+            update_user_meta($user_id, 'synnio_calendar_display_start', sanitize_text_field($_POST['display_start']));
+        }
+        if (isset($_POST['display_end'])) {
+            update_user_meta($user_id, 'synnio_calendar_display_end', sanitize_text_field($_POST['display_end']));
+        }
+
         // Oeffnungszeiten speichern
         if (isset($_POST['business_hours'])) {
             $business_hours = json_decode(stripslashes($_POST['business_hours']), true);

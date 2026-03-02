@@ -90,6 +90,12 @@ class Synnio_Calendar_Frontend {
         $breaks_raw = get_user_meta($current_user_id, 'synnio_calendar_breaks', true);
         $breaks = $breaks_raw ? json_decode($breaks_raw, true) : array();
 
+        // Kalender-Anzeigebereich laden
+        $display_start = get_user_meta($current_user_id, 'synnio_calendar_display_start', true);
+        $display_end = get_user_meta($current_user_id, 'synnio_calendar_display_end', true);
+        if (!$display_start) $display_start = '07:00';
+        if (!$display_end) $display_end = '20:00';
+
         wp_localize_script('synnio-kalender-app-script', 'synnioCalendar', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'restUrl' => rest_url('synnio/v1/calendar/'),
@@ -97,6 +103,8 @@ class Synnio_Calendar_Frontend {
             'userId' => $current_user_id,
             'businessHours' => $business_hours,
             'breaks' => $breaks,
+            'displayStart' => $display_start,
+            'displayEnd' => $display_end,
             'eventTypes' => Synnio_Calendar::get_event_types($current_user_id),
             'i18n' => array(
                 'today' => __('Heute', 'synnio-calendar'),
@@ -626,6 +634,24 @@ class Synnio_Calendar_Frontend {
                                         <option value="0"><?php _e('Sonntag', 'synnio-calendar'); ?></option>
                                         <option value="1"><?php _e('Montag', 'synnio-calendar'); ?></option>
                                     </select>
+                                </div>
+
+                                <?php
+                                $display_start = get_user_meta($user_id, 'synnio_calendar_display_start', true);
+                                $display_end = get_user_meta($user_id, 'synnio_calendar_display_end', true);
+                                if (!$display_start) $display_start = '07:00';
+                                if (!$display_end) $display_end = '20:00';
+                                ?>
+                                <div class="synnio-form-group">
+                                    <label class="synnio-form-label"><?php _e('Kalender-Ansicht Zeitbereich', 'synnio-calendar'); ?></label>
+                                    <p style="color: #6B7280; font-size: 12px; margin-bottom: 8px;">
+                                        <?php _e('Der Kalender zeigt nur diesen Zeitbereich in der Wochen- und Tagesansicht an.', 'synnio-calendar'); ?>
+                                    </p>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <input type="time" class="synnio-form-input" id="synnioSettingsDisplayStart" value="<?php echo esc_attr($display_start); ?>" style="width: 130px;">
+                                        <span class="synnio-bh-separator"><?php _e('bis', 'synnio-calendar'); ?></span>
+                                        <input type="time" class="synnio-form-input" id="synnioSettingsDisplayEnd" value="<?php echo esc_attr($display_end); ?>" style="width: 130px;">
+                                    </div>
                                 </div>
                             </div>
 
