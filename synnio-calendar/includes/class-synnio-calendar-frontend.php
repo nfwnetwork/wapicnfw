@@ -213,17 +213,17 @@ class Synnio_Calendar_Frontend {
                 <div class="synnio-calendar-types">
                     <div class="synnio-section-title"><?php _e('Meine Kalender', 'synnio-calendar'); ?></div>
                     <?php foreach ($calendars as $calendar) : ?>
-                    <label class="synnio-calendar-type-item" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>">
+                    <div class="synnio-calendar-type-item" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>">
                         <input type="checkbox" class="synnio-calendar-toggle" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>" <?php checked($calendar['is_visible'], 1); ?>>
                         <span class="synnio-calendar-color" style="background: <?php echo esc_attr($calendar['color']); ?>"></span>
                         <span class="synnio-calendar-type-name" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>"><?php echo esc_html($calendar['name']); ?></span>
                         <span class="synnio-calendar-type-count" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>">0</span>
                         <?php if (!$readonly) : ?>
-                        <button class="synnio-calendar-edit-btn" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>" data-calendar-name="<?php echo esc_attr($calendar['name']); ?>" data-calendar-color="<?php echo esc_attr($calendar['color']); ?>" title="<?php _e('Kalender bearbeiten', 'synnio-calendar'); ?>">
+                        <button class="synnio-calendar-edit-btn" data-calendar-id="<?php echo esc_attr($calendar['id']); ?>" data-calendar-name="<?php echo esc_attr($calendar['name']); ?>" data-calendar-color="<?php echo esc_attr($calendar['color']); ?>" data-calendar-is-default="<?php echo esc_attr($calendar['is_default']); ?>" title="<?php _e('Kalender bearbeiten', 'synnio-calendar'); ?>">
                             <i class="fas fa-pen"></i>
                         </button>
                         <?php endif; ?>
-                    </label>
+                    </div>
                     <?php endforeach; ?>
                     <?php if (!$readonly) : ?>
                     <button class="synnio-add-calendar-btn" id="synnioAddCalendarBtn">
@@ -510,6 +510,45 @@ class Synnio_Calendar_Frontend {
                 </div>
             </div>
 
+            <!-- Modal: Kalender bearbeiten -->
+            <div class="synnio-modal-overlay" id="synnioEditCalendarModal">
+                <div class="synnio-modal">
+                    <div class="synnio-modal-header">
+                        <h2 class="synnio-modal-title"><?php _e('Kalender bearbeiten', 'synnio-calendar'); ?></h2>
+                        <button class="synnio-modal-close" data-close-modal="synnioEditCalendarModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="synnio-modal-body">
+                        <input type="hidden" id="synnioEditCalendarId" value="">
+                        <div class="synnio-form-group">
+                            <label class="synnio-form-label"><?php _e('Name', 'synnio-calendar'); ?></label>
+                            <input type="text" class="synnio-form-input" id="synnioEditCalendarName" placeholder="<?php _e('Kalendername...', 'synnio-calendar'); ?>">
+                        </div>
+                        <div class="synnio-form-group">
+                            <label class="synnio-form-label"><?php _e('Farbe', 'synnio-calendar'); ?></label>
+                            <div class="synnio-color-options" id="synnioEditCalendarColors">
+                                <?php foreach (Synnio_Calendar::get_calendar_colors() as $color => $name) : ?>
+                                <div class="synnio-color-option" data-color="<?php echo esc_attr($color); ?>" style="background: <?php echo esc_attr($color); ?>;"></div>
+                                <?php endforeach; ?>
+                            </div>
+                            <input type="hidden" id="synnioEditCalendarColor" value="">
+                        </div>
+                    </div>
+                    <div class="synnio-modal-footer">
+                        <button class="synnio-btn synnio-btn-danger" id="synnioDeleteCalendarBtn" style="margin-right: auto;">
+                            <i class="fas fa-trash"></i>
+                            <?php _e('Loeschen', 'synnio-calendar'); ?>
+                        </button>
+                        <button class="synnio-btn synnio-btn-secondary" data-close-modal="synnioEditCalendarModal"><?php _e('Abbrechen', 'synnio-calendar'); ?></button>
+                        <button class="synnio-btn synnio-btn-primary" id="synnioSaveCalendarBtn">
+                            <i class="fas fa-save"></i>
+                            <?php _e('Speichern', 'synnio-calendar'); ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal: Einstellungen -->
             <div class="synnio-modal-overlay" id="synnioSettingsModal">
                 <div class="synnio-modal synnio-modal-large">
@@ -643,7 +682,32 @@ class Synnio_Calendar_Frontend {
 
                         <div class="synnio-tab-content" id="synnioTabApi">
                             <div class="synnio-settings-section">
-                                <h3 class="synnio-settings-title"><?php _e('API Zugang', 'synnio-calendar'); ?></h3>
+                                <h3 class="synnio-settings-title"><?php _e('Ihre Zugangsdaten', 'synnio-calendar'); ?></h3>
+
+                                <div class="synnio-form-group">
+                                    <label class="synnio-form-label"><?php _e('Mandanten-ID (User-ID)', 'synnio-calendar'); ?></label>
+                                    <div class="synnio-api-credential-row">
+                                        <input type="text" class="synnio-form-input" value="<?php echo esc_attr($user_id); ?>" readonly id="synnioApiUserId">
+                                        <button type="button" class="synnio-btn synnio-btn-secondary synnio-copy-btn" data-copy-target="synnioApiUserId" title="<?php _e('Kopieren', 'synnio-calendar'); ?>">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="synnio-form-group">
+                                    <label class="synnio-form-label"><?php _e('API-Schluessel', 'synnio-calendar'); ?></label>
+                                    <div class="synnio-api-credential-row">
+                                        <input type="text" class="synnio-form-input" value="<?php echo esc_attr(get_option('synnio_calendar_api_key', '')); ?>" readonly id="synnioApiKeyField">
+                                        <button type="button" class="synnio-btn synnio-btn-secondary synnio-copy-btn" data-copy-target="synnioApiKeyField" title="<?php _e('Kopieren', 'synnio-calendar'); ?>">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <p style="color: #6B7280; font-size: 12px; margin-top: 6px !important;"><?php _e('Verwenden Sie diesen Schluessel im Header X-Synnio-API-Key bei API-Anfragen.', 'synnio-calendar'); ?></p>
+                                </div>
+                            </div>
+
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('API Endpunkte', 'synnio-calendar'); ?></h3>
 
                                 <div class="synnio-api-info">
                                     <div class="synnio-api-info-title">
@@ -657,10 +721,13 @@ class Synnio_Calendar_Frontend {
                                         GET /wp-json/synnio/v1/calendar/available-slots
                                     </div>
                                     <div class="synnio-api-endpoint">
-                                        GET /wp-json/synnio/v1/calendar/next-available
+                                        GET /wp-json/synnio/v1/calendar/check-availability
                                     </div>
                                     <div class="synnio-api-endpoint">
-                                        POST /wp-json/synnio/v1/calendar/book
+                                        GET /wp-json/synnio/v1/calendar/list-calendars
+                                    </div>
+                                    <div class="synnio-api-endpoint">
+                                        POST /wp-json/synnio/v1/calendar/book-appointment
                                     </div>
                                 </div>
                             </div>

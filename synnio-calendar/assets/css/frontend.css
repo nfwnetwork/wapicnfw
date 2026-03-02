@@ -314,6 +314,29 @@
     background: #E5E7EB !important;
 }
 
+#synnio-calendar-wrapper .synnio-calendar-type-item .synnio-calendar-type-name,
+#synnio-calendar-wrapper .synnio-calendar-type-item .synnio-calendar-color {
+    cursor: pointer !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-credential-row {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+#synnio-calendar-wrapper .synnio-api-credential-row .synnio-form-input {
+    flex: 1 !important;
+    background: #F3F4F6 !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 13px !important;
+}
+
+#synnio-calendar-wrapper .synnio-copy-btn {
+    flex-shrink: 0 !important;
+    padding: 8px 12px !important;
+}
+
 #synnio-calendar-wrapper .synnio-add-calendar-btn {
     width: 100% !important;
     padding: 10px 12px !important;

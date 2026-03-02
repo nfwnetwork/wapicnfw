@@ -88,7 +88,7 @@
         checkModals: function() {
             this.debug('--- Modal Diagnose ---');
 
-            var modalIds = ['synnioEventModal', 'synnioBatchModal', 'synnioSettingsModal'];
+            var modalIds = ['synnioEventModal', 'synnioBatchModal', 'synnioSettingsModal', 'synnioEditCalendarModal'];
             var self = this;
 
             modalIds.forEach(function(id) {
@@ -328,16 +328,73 @@
                     this.debug('>>> Edit Calendar geklickt');
                     e.preventDefault();
                     e.stopPropagation();
-                    this.openEditCalendarModal(btn.dataset.calendarId, btn.dataset.calendarName, btn.dataset.calendarColor);
+                    this.openEditCalendarModal(btn.dataset.calendarId, btn.dataset.calendarName, btn.dataset.calendarColor, btn.dataset.calendarIsDefault);
                     return;
                 }
-                // Auch Icon-Klick innerhalb des Edit-Buttons abfangen
-                if (btn.parentElement && btn.parentElement.classList && btn.parentElement.classList.contains('synnio-calendar-edit-btn')) {
-                    this.debug('>>> Edit Calendar Icon geklickt');
+
+                // Save Calendar (Edit Modal)
+                if (btn.id === 'synnioSaveCalendarBtn') {
+                    this.debug('>>> Save Calendar geklickt');
                     e.preventDefault();
                     e.stopPropagation();
-                    var editBtn = btn.parentElement;
-                    this.openEditCalendarModal(editBtn.dataset.calendarId, editBtn.dataset.calendarName, editBtn.dataset.calendarColor);
+                    this.saveCalendarEdit();
+                    return;
+                }
+
+                // Delete Calendar (Edit Modal)
+                if (btn.id === 'synnioDeleteCalendarBtn') {
+                    this.debug('>>> Delete Calendar geklickt');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.deleteCalendar();
+                    return;
+                }
+
+                // Copy Button (API credentials)
+                if (btn.classList && btn.classList.contains('synnio-copy-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var targetId = btn.dataset.copyTarget;
+                    var targetInput = document.getElementById(targetId);
+                    if (targetInput) {
+                        navigator.clipboard.writeText(targetInput.value).then(function() {
+                            var icon = btn.querySelector('i');
+                            if (icon) {
+                                icon.className = 'fas fa-check';
+                                setTimeout(function() { icon.className = 'fas fa-copy'; }, 1500);
+                            }
+                        });
+                    }
+                    return;
+                }
+
+                // Calendar type item click -> toggle checkbox (da jetzt div statt label)
+                if (btn.classList && btn.classList.contains('synnio-calendar-type-item')) {
+                    // Nicht toggeln wenn Edit-Button geklickt wurde
+                    if (e.target.closest && e.target.closest('.synnio-calendar-edit-btn')) {
+                        return;
+                    }
+                    // Wenn direkt auf Checkbox geklickt wurde, nativ handeln lassen
+                    if (e.target.classList && e.target.classList.contains('synnio-calendar-toggle')) {
+                        return;
+                    }
+                    var checkbox = btn.querySelector('.synnio-calendar-toggle');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        var changeEvent = new Event('change', { bubbles: true });
+                        checkbox.dispatchEvent(changeEvent);
+                    }
+                    return;
+                }
+
+                // Color Option in Edit Calendar Modal
+                if (btn.classList && btn.classList.contains('synnio-color-option') && btn.closest('#synnioEditCalendarModal')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var modal = document.getElementById('synnioEditCalendarModal');
+                    modal.querySelectorAll('.synnio-color-option').forEach(function(opt) { opt.classList.remove('selected'); });
+                    btn.classList.add('selected');
+                    document.getElementById('synnioEditCalendarColor').value = btn.dataset.color;
                     return;
                 }
 
@@ -902,29 +959,43 @@
             xhr.send(formData);
         },
 
-        // Kalender bearbeiten (umbenennen/Farbe aendern/loeschen)
-        openEditCalendarModal: function(calendarId, calendarName, calendarColor) {
-            var self = this;
-            var colors = ['#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#F59E0B', '#EC4899', '#6366F1', '#14B8A6'];
+        // Kalender bearbeiten - Modal oeffnen
+        openEditCalendarModal: function(calendarId, calendarName, calendarColor, isDefault) {
+            this.debug('openEditCalendarModal:', calendarId, calendarName, calendarColor);
 
-            // Einfaches Modal mit Prompt + Farbauswahl
-            var newName = prompt('Kalender umbenennen:\n(Leer lassen um nur Farbe zu aendern, "LOESCHEN" eingeben zum Loeschen)', calendarName);
+            document.getElementById('synnioEditCalendarId').value = calendarId;
+            document.getElementById('synnioEditCalendarName').value = calendarName;
+            document.getElementById('synnioEditCalendarColor').value = calendarColor || '#3B82F6';
 
-            if (newName === null) {
-                return; // Abbruch
+            // Farboption vorauswaehlen
+            var modal = document.getElementById('synnioEditCalendarModal');
+            modal.querySelectorAll('.synnio-color-option').forEach(function(opt) {
+                opt.classList.remove('selected');
+                if (opt.dataset.color === calendarColor) {
+                    opt.classList.add('selected');
+                }
+            });
+
+            // Loeschen-Button nur anzeigen wenn kein Default-Kalender
+            var deleteBtn = document.getElementById('synnioDeleteCalendarBtn');
+            if (deleteBtn) {
+                deleteBtn.style.display = (isDefault === '1') ? 'none' : '';
             }
 
-            // Loeschen?
-            if (newName.toUpperCase() === 'LOESCHEN') {
-                if (!confirm('Kalender "' + calendarName + '" wirklich loeschen?\nAlle Termine in diesem Kalender werden ebenfalls geloescht!')) {
-                    return;
-                }
-                this.deleteCalendar(calendarId, calendarName);
+            this.openModal('synnioEditCalendarModal');
+        },
+
+        // Kalender speichern (umbenennen/Farbe aendern)
+        saveCalendarEdit: function() {
+            var self = this;
+            var calendarId = document.getElementById('synnioEditCalendarId').value;
+            var newName = document.getElementById('synnioEditCalendarName').value.trim();
+            var newColor = document.getElementById('synnioEditCalendarColor').value;
+
+            if (!newName) {
+                alert('Bitte einen Namen eingeben');
                 return;
             }
-
-            // Name aktualisieren
-            var updateName = newName.trim() || calendarName;
 
             if (typeof synnioCalendar === 'undefined') {
                 alert('Kalender aktualisiert (Demo-Modus)');
@@ -935,7 +1006,10 @@
             formData.append('action', 'synnio_calendar_update_calendar');
             formData.append('nonce', synnioCalendar.nonce);
             formData.append('calendar_id', calendarId);
-            formData.append('name', updateName);
+            formData.append('name', newName);
+            if (newColor) {
+                formData.append('color', newColor);
+            }
 
             var xhr = new XMLHttpRequest();
             xhr.open('POST', synnioCalendar.ajaxUrl, true);
@@ -949,14 +1023,26 @@
                             // Name im DOM aktualisieren
                             var nameSpan = document.querySelector('.synnio-calendar-type-name[data-calendar-id="' + calendarId + '"]');
                             if (nameSpan) {
-                                nameSpan.textContent = updateName;
+                                nameSpan.textContent = newName;
+                            }
+                            // Farbe im DOM aktualisieren
+                            if (newColor) {
+                                var colorSpan = nameSpan ? nameSpan.closest('.synnio-calendar-type-item') : null;
+                                if (colorSpan) {
+                                    var colorDot = colorSpan.querySelector('.synnio-calendar-color');
+                                    if (colorDot) {
+                                        colorDot.style.background = newColor;
+                                    }
+                                }
                             }
                             // Edit-Button Data aktualisieren
                             var editBtn = document.querySelector('.synnio-calendar-edit-btn[data-calendar-id="' + calendarId + '"]');
                             if (editBtn) {
-                                editBtn.dataset.calendarName = updateName;
+                                editBtn.dataset.calendarName = newName;
+                                if (newColor) editBtn.dataset.calendarColor = newColor;
                             }
-                            self.debug('Kalender "' + calendarName + '" umbenannt zu "' + updateName + '"');
+                            self.closeModal('synnioEditCalendarModal');
+                            self.debug('Kalender umbenannt zu "' + newName + '"');
                         } else {
                             alert(response.data && response.data.message ? response.data.message : 'Fehler beim Aktualisieren');
                         }
@@ -977,8 +1063,14 @@
         },
 
         // Kalender loeschen
-        deleteCalendar: function(calendarId, calendarName) {
+        deleteCalendar: function() {
             var self = this;
+            var calendarId = document.getElementById('synnioEditCalendarId').value;
+            var calendarName = document.getElementById('synnioEditCalendarName').value;
+
+            if (!confirm('Kalender "' + calendarName + '" wirklich loeschen?\nAlle Termine in diesem Kalender werden ebenfalls geloescht!')) {
+                return;
+            }
 
             if (typeof synnioCalendar === 'undefined') {
                 alert('Kalender geloescht (Demo-Modus)');
@@ -999,8 +1091,14 @@
                         var response = JSON.parse(xhr.responseText);
                         self.debug('Delete Calendar Response:', response);
                         if (response.success) {
-                            alert('Kalender "' + calendarName + '" geloescht!');
-                            location.reload();
+                            self.closeModal('synnioEditCalendarModal');
+                            // Kalender-Item aus DOM entfernen
+                            var item = document.querySelector('.synnio-calendar-type-item[data-calendar-id="' + calendarId + '"]');
+                            if (item) {
+                                item.remove();
+                            }
+                            // Events neu laden
+                            self.loadEvents();
                         } else {
                             alert(response.data && response.data.message ? response.data.message : 'Fehler beim Loeschen');
                         }
