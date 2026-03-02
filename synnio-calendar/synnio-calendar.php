@@ -278,8 +278,8 @@ class Synnio_Calendar {
     /**
      * Hilfsfunktion: Event-Typen
      */
-    public static function get_event_types() {
-        return array(
+    public static function get_event_types($user_id = null) {
+        $types = array(
             'sales' => array(
                 'label' => __('Vertriebszeit', 'synnio-calendar'),
                 'color' => '#10B981',
@@ -305,6 +305,26 @@ class Synnio_Calendar {
                 'color' => '#34D399',
             ),
         );
+
+        // Eigene Termintypen des Benutzers hinzufuegen
+        if ($user_id) {
+            $custom_types_raw = get_user_meta($user_id, 'synnio_calendar_custom_event_types', true);
+            if ($custom_types_raw) {
+                $custom_types = json_decode($custom_types_raw, true);
+                if (is_array($custom_types)) {
+                    foreach ($custom_types as $type) {
+                        if (!empty($type['key']) && !empty($type['label'])) {
+                            $types[sanitize_key($type['key'])] = array(
+                                'label' => sanitize_text_field($type['label']),
+                                'color' => isset($type['color']) ? $type['color'] : '#6B7280',
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        return $types;
     }
 }
 

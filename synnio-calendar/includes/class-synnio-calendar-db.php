@@ -524,7 +524,7 @@ class Synnio_Calendar_DB {
      * Standard-Kalender fuer Benutzer erstellen
      */
     public function create_default_calendars_for_user($user_id) {
-        $event_types = Synnio_Calendar::get_event_types();
+        $event_types = Synnio_Calendar::get_event_types($user_id);
 
         $default_calendars = array(
             array(
@@ -759,11 +759,19 @@ class Synnio_Calendar_DB {
 
         $args = wp_parse_args($args, $defaults);
 
-        // Arbeitszeiten laden
+        // Arbeitszeiten laden - zuerst benutzerspezifisch, dann global
         $work_start = $args['working_hours_start']
             ?: get_option('synnio_calendar_working_hours_start', '08:00');
         $work_end = $args['working_hours_end']
             ?: get_option('synnio_calendar_working_hours_end', '18:00');
+
+        // Benutzerspezifische Oeffnungszeiten laden (pro Wochentag)
+        $user_bh_raw = get_user_meta($user_id, 'synnio_calendar_business_hours', true);
+        $user_business_hours = $user_bh_raw ? json_decode($user_bh_raw, true) : null;
+
+        // Benutzerspezifische Pausenzeiten laden
+        $user_breaks_raw = get_user_meta($user_id, 'synnio_calendar_breaks', true);
+        $user_breaks = $user_breaks_raw ? json_decode($user_breaks_raw, true) : array();
 
         // Kalender laden
         if ($args['calendar_ids'] && is_array($args['calendar_ids'])) {
@@ -798,8 +806,25 @@ class Synnio_Calendar_DB {
         // Tage durchlaufen
         for ($day_offset = 0; $day_offset < $search_days && count($found_slots) < $limit; $day_offset++) {
             $current_date = date('Y-m-d', strtotime($search_start . ' +' . $day_offset . ' days'));
-            $day_start_ts = strtotime($current_date . ' ' . $work_start . ':00');
-            $day_end_ts = strtotime($current_date . ' ' . $work_end . ':00');
+
+            // Wochentag ermitteln (0=So, 6=Sa - JS-kompatibel)
+            $day_of_week_js = (int) date('w', strtotime($current_date));
+
+            // Benutzerspezifische Oeffnungszeiten fuer diesen Wochentag
+            if ($user_business_hours && isset($user_business_hours[$day_of_week_js])) {
+                $day_bh = $user_business_hours[$day_of_week_js];
+                if (empty($day_bh['enabled'])) {
+                    continue; // Tag ist geschlossen - komplett ueberspringen
+                }
+                $day_work_start = $day_bh['start'];
+                $day_work_end = $day_bh['end'];
+            } else {
+                $day_work_start = $work_start;
+                $day_work_end = $work_end;
+            }
+
+            $day_start_ts = strtotime($current_date . ' ' . $day_work_start . ':00');
+            $day_end_ts = strtotime($current_date . ' ' . $day_work_end . ':00');
 
             // Wenn wir heute sind, nicht in der Vergangenheit starten
             $now_ts = current_time('timestamp');
@@ -842,6 +867,22 @@ class Synnio_Calendar_DB {
                         'start' => strtotime($event['start_datetime']),
                         'end' => strtotime($event['end_datetime']),
                     );
+                }
+
+                // Pausenzeiten als belegte Bloecke einfuegen
+                if (!empty($user_breaks)) {
+                    foreach ($user_breaks as $brk) {
+                        if (!empty($brk['start']) && !empty($brk['end'])) {
+                            $brk_start = strtotime($current_date . ' ' . $brk['start'] . ':00');
+                            $brk_end = strtotime($current_date . ' ' . $brk['end'] . ':00');
+                            if ($brk_end > $brk_start) {
+                                $busy_blocks[] = array(
+                                    'start' => $brk_start,
+                                    'end' => $brk_end,
+                                );
+                            }
+                        }
+                    }
                 }
 
                 // Nach Startzeit sortieren

@@ -790,7 +790,7 @@ class Synnio_Calendar_API {
             return new WP_Error('invalid_params', __('Ungueltige Parameter', 'synnio-calendar'), array('status' => 400));
         }
 
-        $event_types = Synnio_Calendar::get_event_types();
+        $event_types = Synnio_Calendar::get_event_types($user_id);
         $type_info = isset($event_types[$event_type]) ? $event_types[$event_type] : $event_types['available'];
 
         $created_count = 0;

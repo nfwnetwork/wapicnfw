@@ -434,6 +434,49 @@
                     return;
                 }
 
+                // Pause hinzufuegen Button
+                if (btn.id === 'synnioAddBreakBtn') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.addBreakRow();
+                    return;
+                }
+
+                // Pause entfernen Button
+                if (btn.classList && btn.classList.contains('synnio-remove-break-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var breakRow = btn.closest('.synnio-break-row');
+                    if (breakRow) breakRow.remove();
+                    return;
+                }
+
+                // Termintyp hinzufuegen Button
+                if (btn.id === 'synnioAddEventTypeBtn') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.addEventTypeRow();
+                    return;
+                }
+
+                // Termintyp entfernen Button
+                if (btn.classList && btn.classList.contains('synnio-remove-cet-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var cetRow = btn.closest('.synnio-custom-event-type-row');
+                    if (cetRow) cetRow.remove();
+                    return;
+                }
+
+                // Feiertage herunterladen Button
+                if (btn.id === 'synnioDownloadHolidaysBtn') {
+                    this.debug('>>> Download Holidays geklickt');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.importHolidays();
+                    return;
+                }
+
                 // Time Slot Click
                 if (btn.classList && btn.classList.contains('synnio-time-slot')) {
                     this.debug('>>> Time Slot geklickt');
@@ -1447,6 +1490,9 @@
                     html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
                 }
 
+                // Oeffnungszeiten- und Pausen-Overlays
+                html += self.renderTimeOverlays(dayDate.getDay());
+
                 html += '</div>';
             }
 
@@ -1497,6 +1543,9 @@
                 var top = (minutes / 60) * 60;
                 html += '<div class="synnio-current-time-line" style="top: ' + top + 'px;"></div>';
             }
+
+            // Oeffnungszeiten- und Pausen-Overlays
+            html += self.renderTimeOverlays(this.currentDate.getDay());
 
             html += '</div>';
             html += '</div>';
@@ -1615,25 +1664,148 @@
         // Events rendern
         renderEvents: function() {
             var self = this;
+
+            // 1. Sichtbare Events nach Tages-Spalte gruppieren
+            var dayGroups = {};
             this.events.forEach(function(event) {
-                self.renderEvent(event);
+                var eventCalendarId = String(event.calendarId || event.calendar_id || '');
+                if (self.selectedCalendars && self.selectedCalendars.length > 0) {
+                    if (eventCalendarId && self.selectedCalendars.indexOf(eventCalendarId) === -1) {
+                        return;
+                    }
+                }
+                var startDate = new Date(event.start || event.start_time);
+                var dateStr = self.formatDate(startDate);
+                if (!dayGroups[dateStr]) {
+                    dayGroups[dateStr] = [];
+                }
+                dayGroups[dateStr].push(event);
+            });
+
+            // 2. Fuer jede Tages-Spalte Ueberlappungen berechnen und rendern
+            Object.keys(dayGroups).forEach(function(dateStr) {
+                var eventsForDay = dayGroups[dateStr];
+                var layoutEvents = self.calculateParallelLayout(eventsForDay);
+                layoutEvents.forEach(function(layoutEvt) {
+                    self.renderEvent(layoutEvt.event, layoutEvt.colIndex, layoutEvt.totalCols, dateStr);
+                });
             });
         },
 
-        renderEvent: function(event) {
-            // Pruefen ob Kalender ausgewaehlt ist (calendarId von AJAX, calendar_id als Fallback)
-            var eventCalendarId = String(event.calendarId || event.calendar_id || '');
-            if (this.selectedCalendars && this.selectedCalendars.length > 0) {
-                if (eventCalendarId && this.selectedCalendars.indexOf(eventCalendarId) === -1) {
-                    // Kalender nicht ausgewaehlt, Event nicht anzeigen
-                    return;
+        // Parallele Anordnung berechnen (Google Calendar Stil)
+        // Gibt Array von {event, colIndex, totalCols} zurueck
+        calculateParallelLayout: function(events) {
+            var self = this;
+
+            // Events mit Start/End-Minuten anreichern und sortieren
+            var items = events.map(function(event) {
+                var startDate = new Date(event.start || event.start_time);
+                var endDate = new Date(event.end || event.end_time);
+                var startMin = startDate.getHours() * 60 + startDate.getMinutes();
+                var endMin = endDate.getHours() * 60 + endDate.getMinutes();
+                // Mindesthoehe 30 Minuten fuer Ueberlappungserkennung
+                if (endMin <= startMin) endMin = startMin + 30;
+                return { event: event, startMin: startMin, endMin: endMin, colIndex: -1, group: -1 };
+            });
+
+            // Nach Startzeit sortieren, bei Gleichheit nach Endzeit (laengere zuerst)
+            items.sort(function(a, b) {
+                if (a.startMin !== b.startMin) return a.startMin - b.startMin;
+                return b.endMin - a.endMin;
+            });
+
+            // Ueberlappungsgruppen finden und Spalten zuweisen
+            // Algorithmus: Greedy Column Assignment
+            var columns = []; // Array von endMin-Werten pro Spalte
+
+            items.forEach(function(item) {
+                // Freie Spalte finden (erste Spalte deren letztes Event vor diesem startet)
+                var placed = false;
+                for (var c = 0; c < columns.length; c++) {
+                    if (columns[c] <= item.startMin) {
+                        columns[c] = item.endMin;
+                        item.colIndex = c;
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) {
+                    item.colIndex = columns.length;
+                    columns.push(item.endMin);
+                }
+            });
+
+            // Ueberlappungsgruppen bilden um totalCols korrekt zu berechnen
+            // Zwei Events sind in der gleichen Gruppe wenn sie direkt oder transitiv ueberlappen
+            var groups = self.findOverlapGroups(items);
+
+            // Ergebnis mit totalCols pro Gruppe
+            var result = [];
+            groups.forEach(function(group) {
+                // Maximale Spalte in dieser Gruppe = totalCols
+                var maxCol = 0;
+                group.forEach(function(item) {
+                    if (item.colIndex > maxCol) maxCol = item.colIndex;
+                });
+                var totalCols = maxCol + 1;
+
+                group.forEach(function(item) {
+                    result.push({
+                        event: item.event,
+                        colIndex: item.colIndex,
+                        totalCols: totalCols
+                    });
+                });
+            });
+
+            return result;
+        },
+
+        // Zusammenhaengende Ueberlappungsgruppen finden
+        findOverlapGroups: function(items) {
+            if (items.length === 0) return [];
+
+            var groups = [];
+            var currentGroup = [items[0]];
+            var groupEnd = items[0].endMin;
+
+            for (var i = 1; i < items.length; i++) {
+                if (items[i].startMin < groupEnd) {
+                    // Ueberlappt mit der aktuellen Gruppe
+                    currentGroup.push(items[i]);
+                    if (items[i].endMin > groupEnd) {
+                        groupEnd = items[i].endMin;
+                    }
+                } else {
+                    // Neue Gruppe beginnen
+                    groups.push(currentGroup);
+                    currentGroup = [items[i]];
+                    groupEnd = items[i].endMin;
+                }
+            }
+            groups.push(currentGroup);
+
+            return groups;
+        },
+
+        renderEvent: function(event, colIndex, totalCols, dateStr) {
+            // Fallback fuer Einzelaufruf ohne Layout-Parameter
+            if (typeof colIndex === 'undefined') colIndex = 0;
+            if (typeof totalCols === 'undefined') totalCols = 1;
+
+            // Kalender-Filter (nur wenn direkt aufgerufen, nicht ueber renderEvents)
+            if (!dateStr) {
+                var eventCalendarId = String(event.calendarId || event.calendar_id || '');
+                if (this.selectedCalendars && this.selectedCalendars.length > 0) {
+                    if (eventCalendarId && this.selectedCalendars.indexOf(eventCalendarId) === -1) {
+                        return;
+                    }
                 }
             }
 
-            // Server gibt 'start' und 'end' zurueck, nicht 'start_time' und 'end_time'
             var startDate = new Date(event.start || event.start_time);
             var endDate = new Date(event.end || event.end_time);
-            var dateStr = this.formatDate(startDate);
+            if (!dateStr) dateStr = this.formatDate(startDate);
 
             var column = document.querySelector('.synnio-day-column[data-date="' + dateStr + '"]');
             if (!column) return;
@@ -1646,12 +1818,24 @@
             var top = (startHour * 60 + startMinutes);
             var height = ((endHour - startHour) * 60 + (endMinutes - startMinutes));
 
+            // Parallele Breite und Position berechnen
+            var padding = 2; // px Abstand zwischen parallelen Events
+            var widthPercent = (100 / totalCols);
+            var leftPercent = (colIndex * widthPercent);
+
             var eventEl = document.createElement('div');
             eventEl.className = 'synnio-event synnio-event-' + (event.type || event.event_type || 'meeting');
             eventEl.style.top = top + 'px';
             eventEl.style.height = Math.max(height, 30) + 'px';
             eventEl.style.setProperty('background', event.color || '#3B82F6', 'important');
             eventEl.dataset.eventId = event.id;
+
+            // Parallele Positionierung: left und width statt left:4px/right:4px
+            if (totalCols > 1) {
+                eventEl.style.left = 'calc(' + leftPercent + '% + ' + padding + 'px)';
+                eventEl.style.width = 'calc(' + widthPercent + '% - ' + (padding * 2) + 'px)';
+                eventEl.style.right = 'auto';
+            }
 
             eventEl.innerHTML = '<div class="synnio-event-title">' + this.escapeHtml(event.title) + '</div>' +
                                '<div class="synnio-event-time">' + this.formatTime(startDate) + ' - ' + this.formatTime(endDate) + '</div>';
@@ -1963,6 +2147,52 @@
             if (weekStarts) formData.append('week_starts', weekStarts.value);
             if (syncDirection) formData.append('sync_direction', syncDirection.value);
 
+            // Oeffnungszeiten sammeln
+            var businessHours = {};
+            for (var d = 0; d < 7; d++) {
+                var enabledCb = document.querySelector('.synnio-bh-enabled[data-day="' + d + '"]');
+                var startInput = document.querySelector('.synnio-bh-start[data-day="' + d + '"]');
+                var endInput = document.querySelector('.synnio-bh-end[data-day="' + d + '"]');
+                businessHours[d] = {
+                    enabled: enabledCb ? enabledCb.checked : false,
+                    start: startInput ? startInput.value : '08:00',
+                    end: endInput ? endInput.value : '18:00'
+                };
+            }
+            formData.append('business_hours', JSON.stringify(businessHours));
+
+            // Pausenzeiten sammeln
+            var breaks = [];
+            document.querySelectorAll('.synnio-break-row').forEach(function(row) {
+                var label = row.querySelector('.synnio-break-label');
+                var start = row.querySelector('.synnio-break-start');
+                var end = row.querySelector('.synnio-break-end');
+                if (start && end && start.value && end.value) {
+                    breaks.push({
+                        label: label ? label.value : '',
+                        start: start.value,
+                        end: end.value
+                    });
+                }
+            });
+            formData.append('breaks', JSON.stringify(breaks));
+
+            // Eigene Termintypen sammeln
+            var customEventTypes = [];
+            document.querySelectorAll('.synnio-custom-event-type-row').forEach(function(row) {
+                var key = row.querySelector('.synnio-cet-key');
+                var label = row.querySelector('.synnio-cet-label');
+                var color = row.querySelector('.synnio-cet-color');
+                if (key && label && key.value.trim() && label.value.trim()) {
+                    customEventTypes.push({
+                        key: key.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'),
+                        label: label.value.trim(),
+                        color: color ? color.value : '#6B7280'
+                    });
+                }
+            });
+            formData.append('custom_event_types', JSON.stringify(customEventTypes));
+
             var xhr = new XMLHttpRequest();
             xhr.open('POST', synnioCalendar.ajaxUrl, true);
 
@@ -1971,8 +2201,12 @@
                     try {
                         var response = JSON.parse(xhr.responseText);
                         if (response.success) {
+                            // Lokale Daten aktualisieren
+                            synnioCalendar.businessHours = businessHours;
+                            synnioCalendar.breaks = breaks;
                             alert(response.data.message || 'Einstellungen gespeichert');
                             self.closeAllModals();
+                            self.renderCalendar();
                         } else {
                             alert(response.data && response.data.message ? response.data.message : 'Fehler beim Speichern');
                         }
@@ -1983,6 +2217,145 @@
             };
 
             xhr.send(formData);
+        },
+
+        // Pause-Zeile hinzufuegen
+        addBreakRow: function() {
+            var list = document.getElementById('synnioBreaksList');
+            if (!list) return;
+            var idx = list.querySelectorAll('.synnio-break-row').length;
+            var row = document.createElement('div');
+            row.className = 'synnio-break-row';
+            row.dataset.breakIndex = idx;
+            row.innerHTML = '<input type="text" class="synnio-form-input synnio-break-label" placeholder="z.B. Mittagspause">' +
+                '<input type="time" class="synnio-form-input synnio-break-start" value="12:00">' +
+                '<span class="synnio-bh-separator">bis</span>' +
+                '<input type="time" class="synnio-form-input synnio-break-end" value="13:00">' +
+                '<button type="button" class="synnio-btn synnio-btn-danger synnio-remove-break-btn" title="Entfernen"><i class="fas fa-trash"></i></button>';
+            list.appendChild(row);
+        },
+
+        // Eigenen Termintyp-Zeile hinzufuegen
+        addEventTypeRow: function() {
+            var list = document.getElementById('synnioCustomEventTypesList');
+            if (!list) return;
+            var idx = list.querySelectorAll('.synnio-custom-event-type-row').length;
+            var row = document.createElement('div');
+            row.className = 'synnio-custom-event-type-row';
+            row.dataset.index = idx;
+            row.innerHTML = '<input type="text" class="synnio-form-input synnio-cet-key" placeholder="Schluessel (z.B. wartung)">' +
+                '<input type="text" class="synnio-form-input synnio-cet-label" placeholder="Bezeichnung">' +
+                '<input type="color" class="synnio-cet-color" value="#6B7280">' +
+                '<button type="button" class="synnio-btn synnio-btn-danger synnio-remove-cet-btn" title="Entfernen"><i class="fas fa-trash"></i></button>';
+            list.appendChild(row);
+        },
+
+        // Feiertage importieren
+        importHolidays: function() {
+            var self = this;
+            var stateSelect = document.getElementById('synnioHolidayState');
+            var yearSelect = document.getElementById('synnioHolidayYear');
+            var resultDiv = document.getElementById('synnioHolidayResult');
+
+            if (!stateSelect || !stateSelect.value) {
+                alert('Bitte waehlen Sie ein Bundesland aus.');
+                return;
+            }
+
+            if (typeof synnioCalendar === 'undefined') {
+                alert('Feiertage importiert (Demo-Modus)');
+                return;
+            }
+
+            var btn = document.getElementById('synnioDownloadHolidaysBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importiere...';
+            }
+
+            var formData = new FormData();
+            formData.append('action', 'synnio_calendar_import_holidays');
+            formData.append('nonce', synnioCalendar.nonce);
+            formData.append('state', stateSelect.value);
+            formData.append('year', yearSelect ? yearSelect.value : new Date().getFullYear());
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', synnioCalendar.ajaxUrl, true);
+
+            xhr.onload = function() {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-download"></i> Feiertage herunterladen und importieren';
+                }
+
+                if (xhr.status === 200) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            if (resultDiv) {
+                                resultDiv.style.display = 'block';
+                                resultDiv.innerHTML = '<div style="padding: 12px; background: #ECFDF5; border-radius: 8px; color: #065F46;"><i class="fas fa-check-circle"></i> ' + self.escapeHtml(response.data.message) + '</div>';
+                            }
+                            self.loadEvents();
+                        } else {
+                            if (resultDiv) {
+                                resultDiv.style.display = 'block';
+                                resultDiv.innerHTML = '<div style="padding: 12px; background: #FEF2F2; border-radius: 8px; color: #991B1B;"><i class="fas fa-exclamation-circle"></i> ' + self.escapeHtml(response.data.message || 'Fehler') + '</div>';
+                            }
+                        }
+                    } catch (e) {
+                        self.debug('Fehler:', e);
+                    }
+                }
+            };
+
+            xhr.send(formData);
+        },
+
+        // Hilfsfunktion: Zeitstring zu Minuten
+        timeToMinutes: function(timeStr) {
+            if (!timeStr) return 0;
+            var parts = timeStr.split(':');
+            return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10);
+        },
+
+        // Oeffnungszeiten- und Pausen-Overlays fuer einen Wochentag generieren
+        renderTimeOverlays: function(dayOfWeek) {
+            var html = '';
+            var bh = (typeof synnioCalendar !== 'undefined' && synnioCalendar.businessHours) ? synnioCalendar.businessHours[dayOfWeek] : null;
+
+            if (bh) {
+                if (!bh.enabled) {
+                    // Ganzer Tag geschlossen
+                    html += '<div class="synnio-closed-overlay" style="top: 0; height: 1440px;" title="Geschlossen"></div>';
+                } else {
+                    var startMin = this.timeToMinutes(bh.start);
+                    var endMin = this.timeToMinutes(bh.end);
+                    // Vor Oeffnung
+                    if (startMin > 0) {
+                        html += '<div class="synnio-closed-overlay" style="top: 0; height: ' + startMin + 'px;"></div>';
+                    }
+                    // Nach Schluss
+                    if (endMin < 1440) {
+                        html += '<div class="synnio-closed-overlay" style="top: ' + endMin + 'px; height: ' + (1440 - endMin) + 'px;"></div>';
+                    }
+                }
+            }
+
+            // Pausen-Overlays (nur wenn Tag offen ist)
+            if (!bh || bh.enabled) {
+                var breaks = (typeof synnioCalendar !== 'undefined' && synnioCalendar.breaks) ? synnioCalendar.breaks : [];
+                var self = this;
+                breaks.forEach(function(brk) {
+                    var brkStartMin = self.timeToMinutes(brk.start);
+                    var brkEndMin = self.timeToMinutes(brk.end);
+                    if (brkEndMin > brkStartMin) {
+                        html += '<div class="synnio-break-overlay" style="top: ' + brkStartMin + 'px; height: ' + (brkEndMin - brkStartMin) + 'px;" title="' + self.escapeHtml(brk.label || 'Pause') + '"></div>';
+                    }
+                });
+            }
+
+            return html;
         },
 
         // Google Calendar verbinden

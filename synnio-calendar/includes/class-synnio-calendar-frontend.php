@@ -68,11 +68,36 @@ class Synnio_Calendar_Frontend {
             true
         );
 
+        $current_user_id = get_current_user_id();
+
+        // Oeffnungszeiten laden
+        $bh_raw = get_user_meta($current_user_id, 'synnio_calendar_business_hours', true);
+        $business_hours = $bh_raw ? json_decode($bh_raw, true) : null;
+        if (!$business_hours) {
+            $default_start = get_option('synnio_calendar_working_hours_start', '08:00');
+            $default_end = get_option('synnio_calendar_working_hours_end', '18:00');
+            $business_hours = array();
+            for ($d = 0; $d < 7; $d++) {
+                $business_hours[$d] = array(
+                    'enabled' => ($d >= 1 && $d <= 5),
+                    'start' => $default_start,
+                    'end' => $default_end,
+                );
+            }
+        }
+
+        // Pausenzeiten laden
+        $breaks_raw = get_user_meta($current_user_id, 'synnio_calendar_breaks', true);
+        $breaks = $breaks_raw ? json_decode($breaks_raw, true) : array();
+
         wp_localize_script('synnio-kalender-app-script', 'synnioCalendar', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'restUrl' => rest_url('synnio/v1/calendar/'),
             'nonce' => wp_create_nonce('synnio_calendar_nonce'),
-            'userId' => get_current_user_id(),
+            'userId' => $current_user_id,
+            'businessHours' => $business_hours,
+            'breaks' => $breaks,
+            'eventTypes' => Synnio_Calendar::get_event_types($current_user_id),
             'i18n' => array(
                 'today' => __('Heute', 'synnio-calendar'),
                 'week' => __('Woche', 'synnio-calendar'),
@@ -365,6 +390,15 @@ class Synnio_Calendar_Frontend {
                             </div>
 
                             <div class="synnio-form-group">
+                                <label class="synnio-form-label"><?php _e('Termintyp', 'synnio-calendar'); ?></label>
+                                <select class="synnio-form-select" id="synnioEventType" name="event_type">
+                                    <?php foreach (Synnio_Calendar::get_event_types($user_id) as $key => $type) : ?>
+                                    <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($type['label']); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="synnio-form-group">
                                 <label class="synnio-form-label"><?php _e('Beschreibung', 'synnio-calendar'); ?></label>
                                 <textarea class="synnio-form-textarea" id="synnioEventDescription" name="description" placeholder="<?php _e('Optionale Beschreibung...', 'synnio-calendar'); ?>"></textarea>
                             </div>
@@ -457,9 +491,14 @@ class Synnio_Calendar_Frontend {
                                 <div class="synnio-form-group">
                                     <label class="synnio-form-label"><?php _e('Termintyp', 'synnio-calendar'); ?></label>
                                     <select class="synnio-form-select" id="synnioBatchType" name="event_type">
-                                        <option value="sales"><?php _e('Vertriebszeit', 'synnio-calendar'); ?></option>
-                                        <option value="consultation"><?php _e('Beratungszeit', 'synnio-calendar'); ?></option>
-                                        <option value="available"><?php _e('Allgemein verfuegbar', 'synnio-calendar'); ?></option>
+                                        <?php
+                                        $batch_types = Synnio_Calendar::get_event_types($user_id);
+                                        $skip_batch = array('blocked', 'private', 'meeting');
+                                        foreach ($batch_types as $key => $type) :
+                                            if (in_array($key, $skip_batch)) continue;
+                                        ?>
+                                        <option value="<?php echo esc_attr($key); ?>"><?php echo esc_html($type['label']); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="synnio-form-group">
@@ -561,6 +600,8 @@ class Synnio_Calendar_Frontend {
                     <div class="synnio-modal-body">
                         <div class="synnio-tabs">
                             <div class="synnio-tab active" data-tab="general"><?php _e('Allgemein', 'synnio-calendar'); ?></div>
+                            <div class="synnio-tab" data-tab="eventTypes"><?php _e('Termintypen', 'synnio-calendar'); ?></div>
+                            <div class="synnio-tab" data-tab="holidays"><?php _e('Feiertage', 'synnio-calendar'); ?></div>
                             <div class="synnio-tab" data-tab="sync"><?php _e('Synchronisation', 'synnio-calendar'); ?></div>
                             <div class="synnio-tab" data-tab="api"><?php _e('API', 'synnio-calendar'); ?></div>
                         </div>
@@ -586,6 +627,177 @@ class Synnio_Calendar_Frontend {
                                         <option value="1"><?php _e('Montag', 'synnio-calendar'); ?></option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <!-- Oeffnungszeiten -->
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('Oeffnungszeiten', 'synnio-calendar'); ?></h3>
+                                <p style="color: #6B7280; font-size: 13px; margin-bottom: 16px;">
+                                    <?php _e('Legen Sie Ihre Geschaeftszeiten fest. Ausserhalb dieser Zeiten werden keine Termine gebucht.', 'synnio-calendar'); ?>
+                                </p>
+                                <?php
+                                $bh_raw = get_user_meta($user_id, 'synnio_calendar_business_hours', true);
+                                $bh_data = $bh_raw ? json_decode($bh_raw, true) : null;
+                                if (!$bh_data) {
+                                    $bh_default_start = get_option('synnio_calendar_working_hours_start', '08:00');
+                                    $bh_default_end = get_option('synnio_calendar_working_hours_end', '18:00');
+                                    $bh_data = array();
+                                    for ($d = 0; $d < 7; $d++) {
+                                        $bh_data[$d] = array(
+                                            'enabled' => ($d >= 1 && $d <= 5),
+                                            'start' => $bh_default_start,
+                                            'end' => $bh_default_end,
+                                        );
+                                    }
+                                }
+                                $bh_day_names = array(
+                                    0 => __('Sonntag', 'synnio-calendar'),
+                                    1 => __('Montag', 'synnio-calendar'),
+                                    2 => __('Dienstag', 'synnio-calendar'),
+                                    3 => __('Mittwoch', 'synnio-calendar'),
+                                    4 => __('Donnerstag', 'synnio-calendar'),
+                                    5 => __('Freitag', 'synnio-calendar'),
+                                    6 => __('Samstag', 'synnio-calendar'),
+                                );
+                                // Reihenfolge: Mo-So
+                                $bh_order = array(1, 2, 3, 4, 5, 6, 0);
+                                ?>
+                                <div id="synnioBusinessHours">
+                                    <?php foreach ($bh_order as $d) :
+                                        $day = isset($bh_data[$d]) ? $bh_data[$d] : array('enabled' => false, 'start' => '08:00', 'end' => '18:00');
+                                    ?>
+                                    <div class="synnio-business-hours-row" data-day="<?php echo $d; ?>">
+                                        <label class="synnio-bh-day-label">
+                                            <input type="checkbox" class="synnio-bh-enabled" data-day="<?php echo $d; ?>" <?php echo $day['enabled'] ? 'checked' : ''; ?>>
+                                            <span><?php echo esc_html($bh_day_names[$d]); ?></span>
+                                        </label>
+                                        <input type="time" class="synnio-form-input synnio-bh-start" data-day="<?php echo $d; ?>" value="<?php echo esc_attr($day['start']); ?>">
+                                        <span class="synnio-bh-separator"><?php _e('bis', 'synnio-calendar'); ?></span>
+                                        <input type="time" class="synnio-form-input synnio-bh-end" data-day="<?php echo $d; ?>" value="<?php echo esc_attr($day['end']); ?>">
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- Pausenzeiten -->
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('Pausenzeiten', 'synnio-calendar'); ?></h3>
+                                <p style="color: #6B7280; font-size: 13px; margin-bottom: 16px;">
+                                    <?php _e('Definieren Sie wiederkehrende Pausen. Waehrend Pausen werden keine Termine gebucht.', 'synnio-calendar'); ?>
+                                </p>
+                                <?php
+                                $breaks_raw = get_user_meta($user_id, 'synnio_calendar_breaks', true);
+                                $breaks_data = $breaks_raw ? json_decode($breaks_raw, true) : array();
+                                ?>
+                                <div id="synnioBreaksList">
+                                    <?php foreach ($breaks_data as $idx => $brk) : ?>
+                                    <div class="synnio-break-row" data-break-index="<?php echo $idx; ?>">
+                                        <input type="text" class="synnio-form-input synnio-break-label" placeholder="<?php _e('z.B. Mittagspause', 'synnio-calendar'); ?>" value="<?php echo esc_attr($brk['label']); ?>">
+                                        <input type="time" class="synnio-form-input synnio-break-start" value="<?php echo esc_attr($brk['start']); ?>">
+                                        <span class="synnio-bh-separator"><?php _e('bis', 'synnio-calendar'); ?></span>
+                                        <input type="time" class="synnio-form-input synnio-break-end" value="<?php echo esc_attr($brk['end']); ?>">
+                                        <button type="button" class="synnio-btn synnio-btn-danger synnio-remove-break-btn" title="<?php _e('Entfernen', 'synnio-calendar'); ?>">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <button type="button" class="synnio-add-calendar-btn" id="synnioAddBreakBtn">
+                                    <i class="fas fa-plus"></i> <?php _e('Pause hinzufuegen', 'synnio-calendar'); ?>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Termintypen -->
+                        <div class="synnio-tab-content" id="synnioTabEventTypes">
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('Standard-Termintypen', 'synnio-calendar'); ?></h3>
+                                <p style="color: #6B7280; font-size: 13px; margin-bottom: 16px;">
+                                    <?php _e('Diese Termintypen sind fest vordefiniert.', 'synnio-calendar'); ?>
+                                </p>
+                                <?php foreach (Synnio_Calendar::get_event_types() as $key => $type) : ?>
+                                <div class="synnio-event-type-display-row">
+                                    <span class="synnio-event-type-color" style="background: <?php echo esc_attr($type['color']); ?>;"></span>
+                                    <span class="synnio-event-type-label"><?php echo esc_html($type['label']); ?></span>
+                                    <code class="synnio-event-type-key"><?php echo esc_html($key); ?></code>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('Eigene Termintypen', 'synnio-calendar'); ?></h3>
+                                <p style="color: #6B7280; font-size: 13px; margin-bottom: 16px;">
+                                    <?php _e('Erstellen Sie eigene Termintypen mit individuellem Namen und Farbe.', 'synnio-calendar'); ?>
+                                </p>
+                                <?php
+                                $custom_types_raw = get_user_meta($user_id, 'synnio_calendar_custom_event_types', true);
+                                $custom_types = $custom_types_raw ? json_decode($custom_types_raw, true) : array();
+                                ?>
+                                <div id="synnioCustomEventTypesList">
+                                    <?php foreach ($custom_types as $idx => $ctype) : ?>
+                                    <div class="synnio-custom-event-type-row" data-index="<?php echo $idx; ?>">
+                                        <input type="text" class="synnio-form-input synnio-cet-key" placeholder="<?php _e('Schluessel (z.B. wartung)', 'synnio-calendar'); ?>" value="<?php echo esc_attr($ctype['key']); ?>">
+                                        <input type="text" class="synnio-form-input synnio-cet-label" placeholder="<?php _e('Bezeichnung', 'synnio-calendar'); ?>" value="<?php echo esc_attr($ctype['label']); ?>">
+                                        <input type="color" class="synnio-cet-color" value="<?php echo esc_attr($ctype['color']); ?>">
+                                        <button type="button" class="synnio-btn synnio-btn-danger synnio-remove-cet-btn" title="<?php _e('Entfernen', 'synnio-calendar'); ?>">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <button type="button" class="synnio-add-calendar-btn" id="synnioAddEventTypeBtn">
+                                    <i class="fas fa-plus"></i> <?php _e('Termintyp hinzufuegen', 'synnio-calendar'); ?>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab: Feiertage -->
+                        <div class="synnio-tab-content" id="synnioTabHolidays">
+                            <div class="synnio-settings-section">
+                                <h3 class="synnio-settings-title"><?php _e('Gesetzliche Feiertage', 'synnio-calendar'); ?></h3>
+                                <p style="color: #6B7280; font-size: 13px; margin-bottom: 16px;">
+                                    <?php _e('Laden Sie alle gesetzlichen Feiertage Ihres Bundeslandes herunter. Sie werden als ganztaegige blockierte Termine importiert, an denen keine Buchungen moeglich sind.', 'synnio-calendar'); ?>
+                                </p>
+
+                                <?php $saved_state = get_user_meta($user_id, 'synnio_calendar_holiday_state', true); ?>
+                                <div class="synnio-form-row">
+                                    <div class="synnio-form-group">
+                                        <label class="synnio-form-label"><?php _e('Bundesland', 'synnio-calendar'); ?></label>
+                                        <select class="synnio-form-select" id="synnioHolidayState">
+                                            <option value=""><?php _e('-- Bitte waehlen --', 'synnio-calendar'); ?></option>
+                                            <option value="BW" <?php selected($saved_state, 'BW'); ?>>Baden-Wuerttemberg</option>
+                                            <option value="BY" <?php selected($saved_state, 'BY'); ?>>Bayern</option>
+                                            <option value="BE" <?php selected($saved_state, 'BE'); ?>>Berlin</option>
+                                            <option value="BB" <?php selected($saved_state, 'BB'); ?>>Brandenburg</option>
+                                            <option value="HB" <?php selected($saved_state, 'HB'); ?>>Bremen</option>
+                                            <option value="HH" <?php selected($saved_state, 'HH'); ?>>Hamburg</option>
+                                            <option value="HE" <?php selected($saved_state, 'HE'); ?>>Hessen</option>
+                                            <option value="MV" <?php selected($saved_state, 'MV'); ?>>Mecklenburg-Vorpommern</option>
+                                            <option value="NI" <?php selected($saved_state, 'NI'); ?>>Niedersachsen</option>
+                                            <option value="NW" <?php selected($saved_state, 'NW'); ?>>Nordrhein-Westfalen</option>
+                                            <option value="RP" <?php selected($saved_state, 'RP'); ?>>Rheinland-Pfalz</option>
+                                            <option value="SL" <?php selected($saved_state, 'SL'); ?>>Saarland</option>
+                                            <option value="SN" <?php selected($saved_state, 'SN'); ?>>Sachsen</option>
+                                            <option value="ST" <?php selected($saved_state, 'ST'); ?>>Sachsen-Anhalt</option>
+                                            <option value="SH" <?php selected($saved_state, 'SH'); ?>>Schleswig-Holstein</option>
+                                            <option value="TH" <?php selected($saved_state, 'TH'); ?>>Thueringen</option>
+                                        </select>
+                                    </div>
+                                    <div class="synnio-form-group">
+                                        <label class="synnio-form-label"><?php _e('Jahr', 'synnio-calendar'); ?></label>
+                                        <select class="synnio-form-select" id="synnioHolidayYear">
+                                            <?php for ($y = intval(date('Y')); $y <= intval(date('Y')) + 2; $y++) : ?>
+                                            <option value="<?php echo $y; ?>"><?php echo $y; ?></option>
+                                            <?php endfor; ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="synnio-btn synnio-btn-primary" id="synnioDownloadHolidaysBtn">
+                                    <i class="fas fa-download"></i> <?php _e('Feiertage herunterladen und importieren', 'synnio-calendar'); ?>
+                                </button>
+
+                                <div id="synnioHolidayResult" style="margin-top: 16px; display: none;"></div>
                             </div>
                         </div>
 

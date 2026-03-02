@@ -43,6 +43,9 @@ class Synnio_Calendar_Ajax {
         // Einstellungen
         add_action('wp_ajax_synnio_calendar_save_settings', array($this, 'save_settings'));
 
+        // Feiertage
+        add_action('wp_ajax_synnio_calendar_import_holidays', array($this, 'import_holidays'));
+
         // Admin AJAX
         add_action('wp_ajax_synnio_calendar_admin_toggle_user', array($this, 'admin_toggle_user'));
     }
@@ -486,7 +489,7 @@ class Synnio_Calendar_Ajax {
             return;
         }
 
-        $event_types = Synnio_Calendar::get_event_types();
+        $event_types = Synnio_Calendar::get_event_types($user_id);
         $type_info = isset($event_types[$event_type]) ? $event_types[$event_type] : $event_types['available'];
 
         $created_count = 0;
@@ -602,7 +605,170 @@ class Synnio_Calendar_Ajax {
             update_user_meta($user_id, 'synnio_calendar_sync_direction', sanitize_text_field($_POST['sync_direction']));
         }
 
+        // Oeffnungszeiten speichern
+        if (isset($_POST['business_hours'])) {
+            $business_hours = json_decode(stripslashes($_POST['business_hours']), true);
+            if (is_array($business_hours)) {
+                $sanitized_bh = array();
+                for ($d = 0; $d < 7; $d++) {
+                    if (isset($business_hours[$d]) || isset($business_hours[strval($d)])) {
+                        $day = isset($business_hours[$d]) ? $business_hours[$d] : $business_hours[strval($d)];
+                        $sanitized_bh[$d] = array(
+                            'enabled' => !empty($day['enabled']),
+                            'start' => isset($day['start']) ? sanitize_text_field($day['start']) : '08:00',
+                            'end' => isset($day['end']) ? sanitize_text_field($day['end']) : '18:00',
+                        );
+                    }
+                }
+                update_user_meta($user_id, 'synnio_calendar_business_hours', wp_json_encode($sanitized_bh));
+            }
+        }
+
+        // Pausenzeiten speichern
+        if (isset($_POST['breaks'])) {
+            $breaks = json_decode(stripslashes($_POST['breaks']), true);
+            if (is_array($breaks)) {
+                $sanitized_breaks = array();
+                foreach ($breaks as $brk) {
+                    if (!empty($brk['start']) && !empty($brk['end'])) {
+                        $sanitized_breaks[] = array(
+                            'label' => isset($brk['label']) ? sanitize_text_field($brk['label']) : '',
+                            'start' => sanitize_text_field($brk['start']),
+                            'end' => sanitize_text_field($brk['end']),
+                        );
+                    }
+                }
+                update_user_meta($user_id, 'synnio_calendar_breaks', wp_json_encode($sanitized_breaks));
+            }
+        }
+
+        // Eigene Termintypen speichern
+        if (isset($_POST['custom_event_types'])) {
+            $custom_types = json_decode(stripslashes($_POST['custom_event_types']), true);
+            if (is_array($custom_types)) {
+                $sanitized_types = array();
+                foreach ($custom_types as $type) {
+                    if (!empty($type['key']) && !empty($type['label'])) {
+                        $sanitized_types[] = array(
+                            'key' => sanitize_key($type['key']),
+                            'label' => sanitize_text_field($type['label']),
+                            'color' => isset($type['color']) ? sanitize_hex_color($type['color']) : '#6B7280',
+                        );
+                    }
+                }
+                update_user_meta($user_id, 'synnio_calendar_custom_event_types', wp_json_encode($sanitized_types));
+            }
+        }
+
         wp_send_json_success(array('message' => __('Einstellungen gespeichert', 'synnio-calendar')));
+    }
+
+    /**
+     * Gesetzliche Feiertage importieren
+     */
+    public function import_holidays() {
+        $this->verify_nonce();
+        $this->check_permission();
+
+        $user_id = get_current_user_id();
+        $state = isset($_POST['state']) ? sanitize_text_field($_POST['state']) : '';
+        $year = isset($_POST['year']) ? intval($_POST['year']) : intval(date('Y'));
+        $calendar_id = isset($_POST['calendar_id']) ? intval($_POST['calendar_id']) : 0;
+
+        if (empty($state)) {
+            wp_send_json_error(array('message' => __('Bitte ein Bundesland waehlen', 'synnio-calendar')));
+            return;
+        }
+
+        $valid_states = array('BW', 'BY', 'BE', 'BB', 'HB', 'HH', 'HE', 'MV', 'NI', 'NW', 'RP', 'SL', 'SN', 'ST', 'SH', 'TH');
+        if (!in_array($state, $valid_states)) {
+            wp_send_json_error(array('message' => __('Ungueltiges Bundesland', 'synnio-calendar')));
+            return;
+        }
+
+        // Feiertage von API abrufen
+        $api_url = "https://feiertage-api.de/api/?jahr={$year}&nur_land={$state}";
+        $response = wp_remote_get($api_url, array('timeout' => 15));
+
+        if (is_wp_error($response)) {
+            wp_send_json_error(array('message' => __('Fehler beim Abrufen der Feiertage: ', 'synnio-calendar') . $response->get_error_message()));
+            return;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $holidays = json_decode($body, true);
+
+        if (!is_array($holidays) || empty($holidays)) {
+            wp_send_json_error(array('message' => __('Keine Feiertage gefunden', 'synnio-calendar')));
+            return;
+        }
+
+        // Standard-Kalender ermitteln falls kein calendar_id angegeben
+        if (!$calendar_id) {
+            $db = synnio_calendar()->db;
+            $calendars = $db->get_user_calendars($user_id);
+            if (!empty($calendars)) {
+                // Ersten Kalender verwenden
+                $calendar_id = $calendars[0]['id'];
+            }
+        }
+
+        global $wpdb;
+        $events_table = $wpdb->prefix . 'synnio_calendar_events';
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($holidays as $name => $data) {
+            $date = $data['datum']; // Format: YYYY-MM-DD
+
+            // Duplikat-Pruefung: Gleicher Titel + Datum + all_day + blocked
+            $existing = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$events_table}
+                 WHERE user_id = %d AND title = %s AND DATE(start_datetime) = %s AND all_day = 1 AND event_type = 'blocked'",
+                $user_id,
+                $name,
+                $date
+            ));
+
+            if ($existing > 0) {
+                $skipped++;
+                continue;
+            }
+
+            $wpdb->insert($events_table, array(
+                'user_id' => $user_id,
+                'calendar_id' => $calendar_id,
+                'title' => $name,
+                'description' => sprintf(__('Gesetzlicher Feiertag (%s)', 'synnio-calendar'), $state),
+                'start_datetime' => $date . ' 00:00:00',
+                'end_datetime' => $date . ' 23:59:59',
+                'all_day' => 1,
+                'event_type' => 'blocked',
+                'color' => '#9CA3AF',
+                'is_available' => 0,
+                'is_bookable' => 0,
+                'meta_data' => wp_json_encode(array(
+                    'holiday' => true,
+                    'state' => $state,
+                    'year' => $year,
+                )),
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ));
+
+            if ($wpdb->insert_id) {
+                $created++;
+            }
+        }
+
+        // Bundesland-Praeferenz speichern
+        update_user_meta($user_id, 'synnio_calendar_holiday_state', $state);
+
+        wp_send_json_success(array(
+            'message' => sprintf(__('%d Feiertage importiert, %d uebersprungen (bereits vorhanden).', 'synnio-calendar'), $created, $skipped),
+            'created' => $created,
+            'skipped' => $skipped,
+        ));
     }
 
     /**
@@ -640,7 +806,7 @@ class Synnio_Calendar_Ajax {
      * Event fuer JavaScript formatieren
      */
     private function format_event($event) {
-        $event_types = Synnio_Calendar::get_event_types();
+        $event_types = Synnio_Calendar::get_event_types(get_current_user_id());
         $type_key = $event['event_type'];
         $type_label = isset($event_types[$type_key]) ? $event_types[$type_key]['label'] : $type_key;
 
