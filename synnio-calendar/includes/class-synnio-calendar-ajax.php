@@ -458,11 +458,6 @@ class Synnio_Calendar_Ajax {
             return;
         }
 
-        if ($calendar['is_default']) {
-            wp_send_json_error(array('message' => __('Standard-Kalender kann nicht geloescht werden', 'synnio-calendar')));
-            return;
-        }
-
         $db->delete_calendar($calendar_id);
 
         wp_send_json_success(array('message' => __('Kalender geloescht', 'synnio-calendar')));

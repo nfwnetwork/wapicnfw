@@ -305,8 +305,8 @@
                     return;
                 }
 
-                // Color Option
-                if (btn.classList && btn.classList.contains('synnio-color-option')) {
+                // Color Option (nur Event-Modal, nicht Edit-Calendar-Modal)
+                if (btn.classList && btn.classList.contains('synnio-color-option') && (!btn.closest || !btn.closest('#synnioEditCalendarModal'))) {
                     this.debug('>>> Color Option geklickt:', btn.dataset.color);
                     e.preventDefault();
                     e.stopPropagation();
@@ -976,10 +976,10 @@
                 }
             });
 
-            // Loeschen-Button nur anzeigen wenn kein Default-Kalender
+            // Loeschen-Button immer anzeigen
             var deleteBtn = document.getElementById('synnioDeleteCalendarBtn');
             if (deleteBtn) {
-                deleteBtn.style.display = (isDefault === '1') ? 'none' : '';
+                deleteBtn.style.display = '';
             }
 
             this.openModal('synnioEditCalendarModal');
@@ -1040,6 +1040,23 @@
                             if (editBtn) {
                                 editBtn.dataset.calendarName = newName;
                                 if (newColor) editBtn.dataset.calendarColor = newColor;
+                            }
+                            // Event-Farben im Speicher aktualisieren und neu rendern
+                            if (newColor && self.events && self.events.length) {
+                                self.events.forEach(function(ev) {
+                                    if (String(ev.calendarId) === String(calendarId)) {
+                                        ev.color = newColor;
+                                        ev.backgroundColor = newColor;
+                                        ev.borderColor = newColor;
+                                    }
+                                });
+                                self.renderCalendar();
+                            }
+                            // Kalender-Select im Event-Modal aktualisieren
+                            var calOption = document.querySelector('#synnioEventCalendar option[value="' + calendarId + '"]');
+                            if (calOption) {
+                                calOption.textContent = newName;
+                                if (newColor) calOption.dataset.color = newColor;
                             }
                             self.closeModal('synnioEditCalendarModal');
                             self.debug('Kalender umbenannt zu "' + newName + '"');

@@ -827,7 +827,8 @@
 /* Modal Overlay */
 #synnioEventModal,
 #synnioBatchModal,
-#synnioSettingsModal {
+#synnioSettingsModal,
+#synnioEditCalendarModal {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -850,7 +851,8 @@
 /* Modal aktiv */
 #synnioEventModal.active,
 #synnioBatchModal.active,
-#synnioSettingsModal.active {
+#synnioSettingsModal.active,
+#synnioEditCalendarModal.active {
     display: flex !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -859,7 +861,8 @@
 /* Modal Container */
 #synnioEventModal > .synnio-modal,
 #synnioBatchModal > .synnio-modal,
-#synnioSettingsModal > .synnio-modal {
+#synnioSettingsModal > .synnio-modal,
+#synnioEditCalendarModal > .synnio-modal {
     background: #FFFFFF !important;
     border-radius: 16px !important;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
@@ -877,7 +880,8 @@
 
 #synnioEventModal.active > .synnio-modal,
 #synnioBatchModal.active > .synnio-modal,
-#synnioSettingsModal.active > .synnio-modal {
+#synnioSettingsModal.active > .synnio-modal,
+#synnioEditCalendarModal.active > .synnio-modal {
     transform: scale(1) translateY(0) !important;
 }
 
@@ -887,10 +891,65 @@
     max-width: 720px !important;
 }
 
+/* Edit Calendar Modal - kompakter und modern */
+#synnioEditCalendarModal > .synnio-modal {
+    max-width: 460px !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-header {
+    background: #0F0B45 !important;
+    border-bottom: none !important;
+    padding: 20px 28px !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-title {
+    color: #FFFFFF !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-close {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-close:hover {
+    color: #FFFFFF !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-body {
+    padding: 28px 28px 20px !important;
+}
+
+#synnioEditCalendarModal .synnio-modal-footer {
+    padding: 16px 28px !important;
+    border-radius: 0 0 16px 16px !important;
+}
+
+#synnioEditCalendarModal .synnio-form-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+}
+
+#synnioEditCalendarModal .synnio-color-options {
+    gap: 10px !important;
+    padding: 4px 0 !important;
+}
+
+#synnioEditCalendarModal .synnio-color-option {
+    width: 36px !important;
+    height: 36px !important;
+    transition: transform 0.15s, box-shadow 0.15s !important;
+}
+
 /* Modal Header */
 #synnioEventModal .synnio-modal-header,
 #synnioBatchModal .synnio-modal-header,
-#synnioSettingsModal .synnio-modal-header {
+#synnioSettingsModal .synnio-modal-header,
+#synnioEditCalendarModal .synnio-modal-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -903,7 +962,8 @@
 /* Modal Title */
 #synnioEventModal .synnio-modal-title,
 #synnioBatchModal .synnio-modal-title,
-#synnioSettingsModal .synnio-modal-title {
+#synnioSettingsModal .synnio-modal-title,
+#synnioEditCalendarModal .synnio-modal-title {
     font-size: 18px !important;
     font-weight: 600 !important;
     color: #0F0B45 !important;
@@ -916,7 +976,8 @@
 /* Modal Close Button */
 #synnioEventModal .synnio-modal-close,
 #synnioBatchModal .synnio-modal-close,
-#synnioSettingsModal .synnio-modal-close {
+#synnioSettingsModal .synnio-modal-close,
+#synnioEditCalendarModal .synnio-modal-close {
     width: 32px !important;
     height: 32px !important;
     border: none !important;
@@ -934,7 +995,8 @@
 
 #synnioEventModal .synnio-modal-close:hover,
 #synnioBatchModal .synnio-modal-close:hover,
-#synnioSettingsModal .synnio-modal-close:hover {
+#synnioSettingsModal .synnio-modal-close:hover,
+#synnioEditCalendarModal .synnio-modal-close:hover {
     background: #F3F4F6 !important;
     color: #374151 !important;
 }
@@ -942,8 +1004,9 @@
 /* Modal Body */
 #synnioEventModal .synnio-modal-body,
 #synnioBatchModal .synnio-modal-body,
-#synnioSettingsModal .synnio-modal-body {
-    padding: 24px !important;
+#synnioSettingsModal .synnio-modal-body,
+#synnioEditCalendarModal .synnio-modal-body {
+    padding: 28px 32px !important;
     overflow-y: auto !important;
     flex: 1 !important;
     background: #FFFFFF !important;
@@ -952,7 +1015,8 @@
 /* Modal Footer */
 #synnioEventModal .synnio-modal-footer,
 #synnioBatchModal .synnio-modal-footer,
-#synnioSettingsModal .synnio-modal-footer {
+#synnioSettingsModal .synnio-modal-footer,
+#synnioEditCalendarModal .synnio-modal-footer {
     display: flex !important;
     justify-content: flex-end !important;
     gap: 12px !important;
