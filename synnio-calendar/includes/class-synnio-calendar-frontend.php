@@ -728,7 +728,7 @@ class Synnio_Calendar_Frontend {
                                     </div>
                                     <?php endforeach; ?>
                                 </div>
-                                <button type="button" class="synnio-add-calendar-btn" id="synnioAddBreakBtn">
+                                <button type="button" class="synnio-add-item-btn" id="synnioAddBreakBtn">
                                     <i class="fas fa-plus"></i> <?php _e('Pause hinzufuegen', 'synnio-calendar'); ?>
                                 </button>
                             </div>
@@ -771,7 +771,7 @@ class Synnio_Calendar_Frontend {
                                     </div>
                                     <?php endforeach; ?>
                                 </div>
-                                <button type="button" class="synnio-add-calendar-btn" id="synnioAddEventTypeBtn">
+                                <button type="button" class="synnio-add-item-btn" id="synnioAddEventTypeBtn">
                                     <i class="fas fa-plus"></i> <?php _e('Termintyp hinzufuegen', 'synnio-calendar'); ?>
                                 </button>
                             </div>

@@ -337,7 +337,8 @@
     padding: 8px 12px !important;
 }
 
-#synnio-calendar-wrapper .synnio-add-calendar-btn {
+#synnio-calendar-wrapper .synnio-add-calendar-btn,
+#synnio-calendar-wrapper .synnio-add-item-btn {
     width: 100% !important;
     padding: 10px 12px !important;
     margin-top: 12px !important;
@@ -354,7 +355,8 @@
     transition: all 0.2s !important;
 }
 
-#synnio-calendar-wrapper .synnio-add-calendar-btn:hover {
+#synnio-calendar-wrapper .synnio-add-calendar-btn:hover,
+#synnio-calendar-wrapper .synnio-add-item-btn:hover {
     background: #F9FAFB !important;
     border-color: #9CA3AF !important;
     color: #374151 !important;
