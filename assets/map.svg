@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 440" role="img" aria-label="Einsatzgebiet Karte">
+  <defs>
+    <linearGradient id="m-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eaf4fc"/>
+      <stop offset="1" stop-color="#d6ecfb"/>
+    </linearGradient>
+    <linearGradient id="m-pin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e86d4"/>
+      <stop offset="1" stop-color="#0e3a63"/>
+    </linearGradient>
+    <linearGradient id="m-pin2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7871f"/>
+      <stop offset="1" stop-color="#ff6a00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="520" height="440" rx="28" fill="url(#m-bg)"/>
+
+  <!-- Straßen -->
+  <g stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.9">
+    <path d="M40 120 H480" fill="none"/>
+    <path d="M40 300 H480" fill="none"/>
+    <path d="M140 40 V400" fill="none"/>
+    <path d="M340 40 V400" fill="none"/>
+  </g>
+  <g stroke="#bcd9f0" stroke-width="5" stroke-linecap="round">
+    <path d="M40 210 H480" fill="none"/>
+    <path d="M240 40 V400" fill="none"/>
+  </g>
+
+  <!-- Flächen / Blocks -->
+  <g fill="#c4e0f5" opacity="0.55">
+    <rect x="160" y="140" width="60" height="50" rx="6"/>
+    <rect x="260" y="230" width="60" height="50" rx="6"/>
+    <rect x="360" y="140" width="70" height="50" rx="6"/>
+    <rect x="60" y="230" width="60" height="50" rx="6"/>
+  </g>
+
+  <!-- Fluss -->
+  <path d="M60 60 C160 130 120 240 260 300 C360 340 380 400 460 400" fill="none" stroke="#7fc8ec" stroke-width="14" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Einzugsradius -->
+  <circle cx="260" cy="215" r="150" fill="#0e86d4" opacity="0.08"/>
+  <circle cx="260" cy="215" r="150" fill="none" stroke="#0e86d4" stroke-width="2" stroke-dasharray="6 8" opacity="0.5"/>
+
+  <!-- Pins -->
+  <g>
+    <!-- Haupt-Pin -->
+    <g transform="translate(260 150)">
+      <path d="M0 66 C-26 34 -30 22 -30 4 A30 30 0 1 1 30 4 C30 22 26 34 0 66 Z" fill="url(#m-pin2)"/>
+      <circle cx="0" cy="0" r="13" fill="#ffffff"/>
+      <path d="M0 -8c3 4 5 7 5 10a5 5 0 1 1-10 0c0-3 2-6 5-10z" fill="#ff6a00"/>
+    </g>
+    <!-- Neben-Pins -->
+    <g transform="translate(140 250) scale(0.7)">
+      <path d="M0 66 C-26 34 -30 22 -30 4 A30 30 0 1 1 30 4 C30 22 26 34 0 66 Z" fill="url(#m-pin)"/>
+      <circle cx="0" cy="0" r="12" fill="#ffffff"/>
+    </g>
+    <g transform="translate(380 260) scale(0.7)">
+      <path d="M0 66 C-26 34 -30 22 -30 4 A30 30 0 1 1 30 4 C30 22 26 34 0 66 Z" fill="url(#m-pin)"/>
+      <circle cx="0" cy="0" r="12" fill="#ffffff"/>
+    </g>
+    <g transform="translate(330 130) scale(0.6)">
+      <path d="M0 66 C-26 34 -30 22 -30 4 A30 30 0 1 1 30 4 C30 22 26 34 0 66 Z" fill="url(#m-pin)"/>
+      <circle cx="0" cy="0" r="12" fill="#ffffff"/>
+    </g>
+  </g>
+</svg>

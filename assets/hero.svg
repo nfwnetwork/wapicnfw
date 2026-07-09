@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 600" role="img" aria-label="Rohr- und Kanalreinigung Einsatzszene">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e3a63"/>
+      <stop offset="1" stop-color="#0b2a4a"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#0e86d4"/>
+    </linearGradient>
+    <linearGradient id="van" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6eef6"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12558f"/>
+      <stop offset="1" stop-color="#0e3a63"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#2a6fb0"/>
+      <stop offset="1" stop-color="#0b2a4a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Hintergrund -->
+  <rect width="640" height="600" rx="30" fill="url(#glow)"/>
+
+  <!-- dekorative Kreise -->
+  <circle cx="520" cy="110" r="70" fill="#ffffff" opacity="0.05"/>
+  <circle cx="90" cy="150" r="46" fill="#ffffff" opacity="0.06"/>
+  <circle cx="560" cy="330" r="26" fill="#22d3ee" opacity="0.18"/>
+
+  <!-- Boden / Untergrund -->
+  <path d="M0 430 H640 V600 H0 Z" fill="url(#ground)"/>
+  <path d="M0 430 H640 V452 H0 Z" fill="#ffffff" opacity="0.08"/>
+
+  <!-- Unterirdisches Rohr mit Wasser -->
+  <g>
+    <rect x="-10" y="500" width="660" height="46" rx="10" fill="#0a2440"/>
+    <rect x="-10" y="500" width="660" height="46" rx="10" fill="none" stroke="#2a6fb0" stroke-width="3" opacity="0.5"/>
+    <rect x="-10" y="516" width="660" height="18" rx="8" fill="url(#water)" opacity="0.85"/>
+    <circle cx="120" cy="524" r="4" fill="#bff3ff" opacity="0.8"/>
+    <circle cx="260" cy="527" r="3" fill="#bff3ff" opacity="0.7"/>
+    <circle cx="430" cy="523" r="5" fill="#bff3ff" opacity="0.8"/>
+    <circle cx="560" cy="527" r="3.5" fill="#bff3ff" opacity="0.7"/>
+  </g>
+
+  <!-- Haus im Hintergrund -->
+  <g opacity="0.92">
+    <rect x="70" y="250" width="150" height="180" rx="6" fill="#0e3a63"/>
+    <path d="M60 252 L145 190 L230 252 Z" fill="#12558f"/>
+    <rect x="95" y="290" width="34" height="34" rx="4" fill="#22d3ee" opacity="0.5"/>
+    <rect x="160" y="290" width="34" height="34" rx="4" fill="#22d3ee" opacity="0.5"/>
+    <rect x="128" y="350" width="34" height="80" rx="4" fill="#0a2440"/>
+    <!-- Fallrohr vom Haus zum Kanal -->
+    <path d="M120 430 C120 470 145 470 145 500" fill="none" stroke="#7aa7cc" stroke-width="8" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- Service-Van -->
+  <g>
+    <!-- Schatten -->
+    <ellipse cx="440" cy="432" rx="150" ry="16" fill="#000000" opacity="0.18"/>
+    <!-- Karosserie -->
+    <path d="M320 300 h150 l40 46 h30 a14 14 0 0 1 14 14 v56 a10 10 0 0 1 -10 10 H320 a10 10 0 0 1 -10 -10 V314 a14 14 0 0 1 10 -14 Z" fill="url(#van)"/>
+    <!-- Fahrerkabine Fenster -->
+    <path d="M474 312 l30 34 h-44 v-34 z" fill="#0e3a63" opacity="0.85"/>
+    <!-- Farbstreifen / Branding -->
+    <rect x="310" y="360" width="234" height="26" fill="url(#water)"/>
+    <circle cx="345" cy="373" r="9" fill="#ffffff"/>
+    <path d="M345 366c2 2.5 3.5 4.5 3.5 6a3.5 3.5 0 1 1-7 0c0-1.5 1.5-3.5 3.5-6z" fill="#0e86d4"/>
+    <rect x="366" y="368" width="150" height="10" rx="5" fill="#ffffff" opacity="0.85"/>
+    <!-- Räder -->
+    <circle cx="366" cy="426" r="24" fill="#0a1a2b"/>
+    <circle cx="366" cy="426" r="10" fill="#5b7d9c"/>
+    <circle cx="500" cy="426" r="24" fill="#0a1a2b"/>
+    <circle cx="500" cy="426" r="10" fill="#5b7d9c"/>
+    <!-- Dachaufbau (Warnleuchte) -->
+    <rect x="360" y="288" width="60" height="12" rx="4" fill="#f7871f"/>
+  </g>
+
+  <!-- Technik / Schlauchtrommel -->
+  <g>
+    <circle cx="250" cy="470" r="4" fill="none"/>
+    <path d="M300 470 C240 470 220 500 175 500" fill="none" stroke="#f7871f" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- Techniker -->
+  <g>
+    <!-- Schatten -->
+    <ellipse cx="180" cy="452" rx="46" ry="10" fill="#000000" opacity="0.18"/>
+    <!-- Beine -->
+    <path d="M165 400 l-6 50 h14 l6 -46 z" fill="#0a2440"/>
+    <path d="M188 400 l8 50 h14 l-8 -50 z" fill="#0a2440"/>
+    <!-- Overall -->
+    <path d="M158 320 q22 -14 44 0 l8 62 q-30 12 -60 0 z" fill="#f7871f"/>
+    <path d="M158 320 q22 -14 44 0 l3 22 q-25 10 -50 0 z" fill="#ff6a00"/>
+    <!-- Warnstreifen -->
+    <rect x="160" y="356" width="46" height="7" fill="#ffffff" opacity="0.9" transform="skewX(-4)"/>
+    <!-- Arme + Hochdruckdüse -->
+    <path d="M162 330 q-24 8 -30 34" fill="none" stroke="#f7871f" stroke-width="14" stroke-linecap="round"/>
+    <path d="M200 330 q28 6 44 26" fill="none" stroke="#f7871f" stroke-width="14" stroke-linecap="round"/>
+    <rect x="238" y="348" width="34" height="12" rx="4" fill="#334a60" transform="rotate(18 238 348)"/>
+    <!-- Wasserstrahl -->
+    <path d="M270 366 q26 6 44 24" fill="none" stroke="url(#water)" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="316" cy="392" r="3" fill="#bff3ff"/>
+    <circle cx="300" cy="384" r="2.4" fill="#bff3ff"/>
+    <!-- Kopf + Helm -->
+    <circle cx="180" cy="298" r="20" fill="#f3c9a0"/>
+    <path d="M158 296 a22 16 0 0 1 44 0 l0 4 h-44 z" fill="#ffd23f"/>
+    <rect x="156" y="298" width="48" height="6" rx="3" fill="#e6a700"/>
+  </g>
+
+  <!-- Wassertropfen dekorativ -->
+  <g fill="url(#water)" opacity="0.9">
+    <path d="M470 150 c0 0 16 18 16 30 a16 16 0 0 1-32 0 c0-12 16-30 16-30z"/>
+  </g>
+  <g fill="#22d3ee" opacity="0.55">
+    <path d="M540 210 c0 0 10 11 10 19 a10 10 0 0 1-20 0 c0-8 10-19 10-19z"/>
+  </g>
+</svg>
