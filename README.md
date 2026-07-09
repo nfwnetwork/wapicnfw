@@ -1,8 +1,10 @@
 # Rohr- & Kanalreinigung — modernes Website-Layout
 
 Ein modernes, vollständig responsives Landingpage-Layout für einen Rohr- &
-Kanalreinigungs-Betrieb. Statisches HTML/CSS/JS ohne Build-Schritt und ohne
-externe Runtime-Abhängigkeiten (Fonts optional über Google Fonts).
+Kanalreinigungs-Betrieb. Statisches HTML/CSS/JS ohne Build-Schritt und **ohne
+externe Runtime-Abhängigkeiten**. Es werden bewusst **keine Google Fonts**
+geladen (DSGVO): Die Seite nutzt einen System-Font-Stack und überträgt damit
+keine IP-Adressen an Dritte.
 
 ## Vorschau starten
 
@@ -37,6 +39,14 @@ werden:
 | Preise (89/149/199 €) | Richtpreise | `index.html` → Abschnitt „Preise" |
 | Firmenname, Anschrift, USt-ID | Rechtliche Angaben | `Impressum.html` |
 | Bewertungstexte | Kundenstimmen | `index.html` → Abschnitt „Bewertungen" |
+
+### Schriftart (optional aufwerten)
+
+Aus Datenschutzgründen lädt die Seite keine externen Fonts. Möchten Sie
+Manrope/Inter dennoch nutzen, laden Sie die Dateien **lokal** herunter (z. B.
+per *google-webfonts-helper*), legen Sie sie unter `assets/fonts/` ab und
+binden Sie sie via `@font-face` in `css/styles.css` ein. Der Font-Stack in
+`--font` verwendet sie dann automatisch. So bleibt die Seite DSGVO-konform.
 
 ### Farben ändern
 

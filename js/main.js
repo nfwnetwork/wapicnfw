@@ -132,6 +132,12 @@
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+      // Vorherige Erfolgsmeldung zurücksetzen, damit sie nicht neben
+      // Validierungsfehlern stehen bleibt.
+      if (note) {
+        note.textContent = "";
+        note.classList.remove("is-ok");
+      }
       if (!form.checkValidity()) {
         form.reportValidity();
         return;

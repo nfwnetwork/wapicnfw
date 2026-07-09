@@ -12,9 +12,9 @@
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="de_DE" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Schriftarten werden aus DSGVO-Gründen NICHT von Google geladen.
+       Der System-Font-Stack (siehe --font in css/styles.css) rendert ohne
+       externe Requests. Zum Self-Hosting von Manrope/Inter siehe README. -->
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -189,8 +189,8 @@
     <!-- ===================== WARUM WIR ===================== -->
     <section class="section section--dark" id="warum">
       <div class="container why__grid">
-        <div class="why__media reveal" aria-hidden="true">
-          <img src="assets/inspection.svg" alt="" class="why__img" width="520" height="460" />
+        <div class="why__media reveal">
+          <img src="assets/inspection.svg" alt="Kanal-TV-Inspektion mit Kamera und Monitor" class="why__img" width="520" height="460" loading="lazy" />
         </div>
         <div class="why__content reveal">
           <span class="eyebrow eyebrow--light">Warum Kunden uns vertrauen</span>
@@ -300,8 +300,8 @@
           </ul>
           <a href="#kontakt" class="btn btn--primary btn--lg">Verfügbarkeit prüfen</a>
         </div>
-        <div class="area__map reveal" aria-hidden="true">
-          <img src="assets/map.svg" alt="" width="520" height="440" />
+        <div class="area__map reveal">
+          <img src="assets/map.svg" alt="Karte des Einsatzgebiets mit Einzugsradius und markierten Standorten" width="520" height="440" loading="lazy" />
         </div>
       </div>
     </section>
@@ -416,7 +416,7 @@
             <textarea id="message" name="message" rows="4" placeholder="Beschreiben Sie kurz Ihr Problem …"></textarea>
           </div>
           <label class="check">
-            <input type="checkbox" required />
+            <input type="checkbox" name="privacy_consent" required />
             <span>Ich habe die <a href="Datenschutz.html">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Angaben zur Kontaktaufnahme zu.</span>
           </label>
           <button type="submit" class="btn btn--emergency btn--lg btn--block">Angebot anfordern</button>
